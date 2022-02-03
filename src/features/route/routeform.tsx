@@ -17,7 +17,9 @@ import {SameCity} from './samecity'
 import Autocomplete from '@mui/material/Autocomplete';
 import Chip from '@mui/material/Chip';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import Remove from '../../utils/remove'
 // not a DRY code should be checked later
+
 type VALUES_TYPE  = Required<Pick<ROUTE,'price'|'distance'|'estimatedHour'>>
 interface ERROR_TYPE {
     price?:string
@@ -46,12 +48,9 @@ const FormWrapper = (props:BoxProps)=>{
         <Box sx={{p:1,...sx}} {...other}/>
     )
 }
-const sourceDest = {
-    source:'',
-    destination:'',
-}
 
 export const RouteRegistration:React.FunctionComponent = () => {
+
 const [depPlace, setDepPlace] = React.useState<string[]>([]);
 const handleDepPlaceChange = (event: SelectChangeEvent<typeof depPlace>) => {
   const {
@@ -66,20 +65,17 @@ const timer = React.useRef<number>();
 const [open,setOpen] = useState(false)
 const [samecity,setSameCity] = useState(false)
 const [loading, setLoading] = React.useState(false);
-const [sourceDestValues,setSourceDestValues] = useState(sourceDest)
 const cities = useAppSelector(state=>state.cities)
 const cityNames =  cities.map((city)=>city['name'])
  const [sourceValue, setSourceValue] = React.useState('');
  const [destinationValue, setDestinationValue] = React.useState('');
  const [source, setSource] = React.useState<string>(cityNames[0]);
- const depPlaces = useAppSelector(state=>state.cities.find((city)=>(city.name===source))).departurePlaces
+ const depPlaces = useAppSelector(state=>state.cities.find((city)=>(city.name===source)))?.departurePlaces
  const [destination, setDestination] = React.useState<string>(cityNames[0]);
-// const roleId = useAppSelector(state=>state.roles.find((role)=>role.description===roleItem)) as ROLE
-interface CHIPDATA {
-  key:string
-  label:string
-}
 const [chipData,setChipData] = useState<string[]>([])
+const handleDepChipChange = (index:number)=>()=> {
+  setChipData((chips)=>Remove(chips,index))
+  }
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -98,18 +94,9 @@ const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
   if (reason === 'clickaway') {
     return;
   }
-
   setOpen(false);
 };
 
-const handleCityChange = 
-(e:SelectChangeEvent)=>{
-  const {name,value} = e.target
-  setSourceDestValues({
-      ...sourceDestValues,
-      [name]:value,
-  })
-}
 React.useEffect(()=>{
     document.title+=` - Route Registration`
     return ()=>{
@@ -121,7 +108,6 @@ React.useEffect(()=>{
       price: 0,
       distance:0,
       estimatedHour:0,
-      
     },
     validate,
     onSubmit: (values,{resetForm}) => {
@@ -147,13 +133,12 @@ React.useEffect(()=>{
                 distance:0,
                 estimatedHour: 0,
               }})
-              setSourceDestValues({source:'',destination:''})
+              setSource('')
+              setDestination('')
               setOpen(true)
             },3000)
           }
          }
-         
-        
     },
   });
 
@@ -182,13 +167,12 @@ React.useEffect(()=>{
         onChange={(event: any, newValue: string | null) => {
           setSource(newValue as string);
         }}
-        id="controllable-states-demo"
+        id="controllable-states-"
         inputValue={sourceValue}
         onInputChange={(event, newInputValue) => {
           setSourceValue(newInputValue);
         }}
         options={cityNames}
-        // getOptionLabel = {(option)=>option.name}
         sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Source" />}
       />
@@ -202,21 +186,18 @@ React.useEffect(()=>{
         onChange={(event: any, newValue: string | null) => {
           setDestination(newValue as string);
         }}
-        id="controllable-states-demo"
+        id="controllable-states"
         inputValue={destinationValue}
         onInputChange={(event, newInputValue) => {
           setDestinationValue(newInputValue);
         }}
         options={cityNames}
-        // getOptionLabel = {(option)=>option.name}
         sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Destination" />}
       />
         </FormControl>
 
            </FormWrapper>
-
-
             <FormWrapper>
             <TextField
         
@@ -232,39 +213,35 @@ React.useEffect(()=>{
             </FormWrapper>
           <FormWrapper>
           <FormControl sx={{width: 460 }}>
-        <InputLabel id="demo-multiple-chip-label">Departure Place</InputLabel>
+        <InputLabel id="departure-place">Departure Place</InputLabel>
         <Select
-          labelId="demo-multiple-chip-label"
+          labelId="departure-place-multiple-label"
           id="demo-multiple-chip"
-          // label="Departure Place"
           multiple
           value={depPlace}
           onChange={handleDepPlaceChange}
           input={<OutlinedInput id="select-multiple-chip" label="Departure Place" />}
           renderValue={(selected) => {
             setChipData(selected)
-            // console.log(chipData)
-           return (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {
-                chipData.map((cd,index)=>(
-                  <Chip key={index} label={cd} 
-                  onDelete = {()=>{
-                    setChipData((chips)=>chips.splice(index,1))
-                  }}
-                  />
-                ))
-              }
-          </Box>
-           )
+            return (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {
+                  chipData.map((cd,index)=>(
+                    <Chip key={index} label={cd} 
+                    onDelete = {handleDepChipChange(index)}
+                    />
+                  ))
+                }
+            </Box>
+             )
           }}
           MenuProps={MenuProps}
         >
           {
           depPlaces?
-          depPlaces!.map((depPlace) => (
+          depPlaces!.map((depPlace,index) => (
             <MenuItem
-              
+              key={index}
               value={depPlace}
             >
               {depPlace}
@@ -275,8 +252,7 @@ React.useEffect(()=>{
       </FormControl>
           </FormWrapper>
             <FormWrapper>
-            <TextField
-        
+            <TextField  
         id="distance"
         name="distance"
         label="Distance"
@@ -313,7 +289,9 @@ React.useEffect(()=>{
             <SaveSuccessfull open={open} handleClose={handleClose} message = 'Route Successfully Added' />
             <SameCity open = {samecity} handleClose = {handleSameCityClose}/>
       </form>
+      
       </Box>
+
     </div>
   );
 };
