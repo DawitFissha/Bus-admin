@@ -15,17 +15,16 @@ import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
 import {SameCity} from './samecity'
 import Autocomplete from '@mui/material/Autocomplete';
-import Chip from '@mui/material/Chip';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Remove from '../../utils/remove'
+import Checkbox from '@mui/material/Checkbox';
+import { ListItemText } from '@mui/material';
 // not a DRY code should be checked later
 
-type VALUES_TYPE  = Required<Pick<ROUTE,'price'|'distance'|'estimatedHour'>>
-interface ERROR_TYPE {
-    price?:string
-    distance?:string
-    estimatedHour?:string
+type VALUES_TYPE  = Required<Pick<ROUTE,'price'|'distance'|'estimatedHour'|'assignedBus'>>
+type ERROR_TYPE  = {
+  [Property in keyof VALUES_TYPE]+?:string
 }
+
 const validate = (values:VALUES_TYPE) => {
     const errors:ERROR_TYPE = {}
     if (!values.price) {
@@ -39,6 +38,12 @@ const validate = (values:VALUES_TYPE) => {
     }
     if(values.estimatedHour!<0){
       errors.estimatedHour = "Estimated Hour Can not be Negative"
+    }
+    if(!values.assignedBus){
+      errors.assignedBus = 'Required'
+    }
+    else if(values.assignedBus<0){
+      errors.assignedBus = "This field can't be negative"
     }
     return errors;
   };
@@ -72,10 +77,10 @@ const cityNames =  cities.map((city)=>city['name'])
  const [source, setSource] = React.useState<string>(cityNames[0]);
  const depPlaces = useAppSelector(state=>state.cities.find((city)=>(city.name===source)))?.departurePlaces
  const [destination, setDestination] = React.useState<string>(cityNames[0]);
-const [chipData,setChipData] = useState<string[]>([])
-const handleDepChipChange = (index:number)=>()=> {
-  setChipData((chips)=>Remove(chips,index))
-  }
+// const [chipData,setChipData] = useState<string[]>([])
+// const handleDepChipChange = (index:number)=>()=> {
+//   setChipData((chips)=>Remove(chips,index))
+//   }
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -102,12 +107,14 @@ React.useEffect(()=>{
     return ()=>{
       clearTimeout(timer.current)
     }
+    
 },[])
   const formik = useFormik({
     initialValues: {
       price: 0,
       distance:0,
       estimatedHour:0,
+      assignedBus:0,
     },
     validate,
     onSubmit: (values,{resetForm}) => {
@@ -124,17 +131,21 @@ React.useEffect(()=>{
                 source,
                 destination,
                 price:values.price,
+                departurePlace:depPlace?depPlace:undefined,
                 distance:values.distance>0?values.distance:null,
                 estimatedHour:values.estimatedHour>0?values.estimatedHour:null,
+                assignedBus:values.assignedBus,
               }))
               setLoading(false)
               resetForm({values:{
                 price: 0,
                 distance:0,
                 estimatedHour: 0,
+                assignedBus:0,
               }})
               setSource('')
               setDestination('')
+              setDepPlace([])
               setOpen(true)
             },3000)
           }
@@ -211,42 +222,43 @@ React.useEffect(()=>{
         helperText={formik.touched.price && formik.errors.price}
       />
             </FormWrapper>
+            <FormWrapper>
+            <TextField
+        
+        id="assignedBus"
+        name="assignedBus"
+        label="Number of Busses"
+        type='number'
+        value={formik.values.assignedBus}
+        onChange={formik.handleChange}
+        error={formik.touched.assignedBus && Boolean(formik.errors.assignedBus)}
+        helperText={formik.touched.assignedBus && formik.errors.assignedBus}
+      />
+            </FormWrapper>
           <FormWrapper>
           <FormControl sx={{width: 460 }}>
         <InputLabel id="departure-place">Departure Place</InputLabel>
         <Select
-          labelId="departure-place-multiple-label"
+          labelId="departure-place"
           id="demo-multiple-chip"
           multiple
           value={depPlace}
           onChange={handleDepPlaceChange}
           input={<OutlinedInput id="select-multiple-chip" label="Departure Place" />}
-          renderValue={(selected) => {
-            setChipData(selected)
-            return (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {
-                  chipData.map((cd,index)=>(
-                    <Chip key={index} label={cd} 
-                    onDelete = {handleDepChipChange(index)}
-                    />
-                  ))
-                }
-            </Box>
-             )
-          }}
+          renderValue={(selected)=>selected.join(', ')}
           MenuProps={MenuProps}
         >
           {
           depPlaces?
-          depPlaces!.map((depPlace,index) => (
+          depPlaces!.map((departurePlace,index) => (
             <MenuItem
               key={index}
-              value={depPlace}
+              value={departurePlace}
             >
-              {depPlace}
+              <Checkbox checked={depPlace.indexOf(departurePlace) > -1} />
+              <ListItemText primary={departurePlace} />
             </MenuItem>
-          )):<MenuItem>no departure</MenuItem>
+          )):null
           }
         </Select>
       </FormControl>

@@ -1,4 +1,5 @@
 import React,{useState} from 'react';
+import { nanoid } from '@reduxjs/toolkit';
 import { useFormik } from 'formik';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -114,6 +115,7 @@ React.useEffect(()=>{
             timer.current = window.setTimeout(()=>{
               setLoading(false)
               dispatch(addUser({
+                id:nanoid(),
                 firstName:values.firstName,
                 lastName:values.lastName,
                 gender,

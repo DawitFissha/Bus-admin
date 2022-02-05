@@ -7,6 +7,7 @@ price:number
 departurePlace?:string[]
 distance?:number|null
 estimatedHour?:number|null
+assignedBus:number
 }
 const initialState:ROUTE[] = [
 

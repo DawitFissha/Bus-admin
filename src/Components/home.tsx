@@ -11,7 +11,8 @@ export function Home(){
             }}
           >
             <Link to="/users">Users</Link> |{" "}
-            <Link to="/routes">Routes</Link>
+            <Link to="/routes">Routes</Link> |{" "}
+            <Link to="/busses">Busses</Link>
           </nav>
         </div>
       );

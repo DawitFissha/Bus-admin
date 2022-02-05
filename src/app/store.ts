@@ -3,12 +3,14 @@ import usersReducer from '../features/user/userSlice'
 import rolesReducer from '../features/role/roleSlice'
 import routesReducer from '../features/route/routeSlice'
 import cityReducer from '../features/city/citySlice'
+import busReducer from '../features/bus/busSlice'
 export const store = configureStore({
   reducer: {
     users:usersReducer,
     roles:rolesReducer,
     routes:routesReducer,
     cities:cityReducer,
+    busses:busReducer,
   },
 });
 
