@@ -10,7 +10,14 @@ estimatedHour?:number|null
 assignedBus:number
 }
 const initialState:ROUTE[] = [
-
+{
+    id:'0',
+    source:'x',
+    destination:'y',
+    price:500,
+    departurePlace:['a','b','c'],
+    assignedBus:3
+}
 ]
 const routesSlice = createSlice({
     name:'routes',

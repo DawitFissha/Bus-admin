@@ -4,6 +4,7 @@ import rolesReducer from '../features/role/roleSlice'
 import routesReducer from '../features/route/routeSlice'
 import cityReducer from '../features/city/citySlice'
 import busReducer from '../features/bus/busSlice'
+import scheduleReducer from '../features/schedule/scheduleSlice'
 export const store = configureStore({
   reducer: {
     users:usersReducer,
@@ -11,6 +12,7 @@ export const store = configureStore({
     routes:routesReducer,
     cities:cityReducer,
     busses:busReducer,
+    schedules:scheduleReducer,
   },
 });
 
