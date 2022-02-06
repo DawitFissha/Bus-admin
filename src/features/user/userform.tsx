@@ -215,7 +215,7 @@ React.useEffect(()=>{
         />
             </FormWrapper>
             <FormWrapper>
-            <FormControl sx={{minWidth: 120 }}>
+            <FormControl sx={{minWidth: 460 }}>
             <InputLabel id="role-select-helper-label">Role</InputLabel>
         <Select
           labelId="role-select-helper-label"

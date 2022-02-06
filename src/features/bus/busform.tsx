@@ -13,8 +13,11 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
+import { ListItemText } from '@mui/material';
+import {AddButton} from '../../Components/addbutton'
 
 // not a DRY code should be checked later
+
 const RoleData = {
     DRIVER:'3',
     REDAT:'4',
@@ -53,24 +56,16 @@ const [loading, setLoading] = React.useState(false);
 const users = useAppSelector(state=>state.users)
 const initialDrivers = users.filter(user=>user.role===RoleData.DRIVER) ;
 const initialRedats = users.filter(user=>user.role===RoleData.REDAT) ;
-//  const userData = {
-//      driver:'',
-//      redat:'',
-//  }
 const [driver,setDriver] = useState('')
 const [redat,setRedat] = useState('')
-//  const [driverAndRedat,setDriverAndRedat] = useState(userData)
+
  const handleDriverAndRedatChange = (e:SelectChangeEvent)=>{
-    // const {name,value} = e.target
-    // setDriverAndRedat({...userData,[name]:value})
     setDriver(e.target.value)
-    
- }
+    }
  const handleRedatChange = (e:SelectChangeEvent)=>{
     setRedat(e.target.value)
  }
-//  const driverId = useAppSelector(state=>state.users.find((user)=>user.firstName===driverAndRedat.driver))?.id
-//  const redatId = useAppSelector(state=>state.users.find((user)=>user.firstName===driverAndRedat.redat))?.id
+
 const driverId = useAppSelector(state=>state.users.find((user)=>user.firstName===driver))?.id
 const redatId = useAppSelector(state=>state.users.find((user)=>user.firstName===redat))?.id
 const dispatch = useAppDispatch();
@@ -116,10 +111,6 @@ useEffect(()=>{
                 NoOfSeat: 0,
                 
               }})
-            //   setDriverAndRedat({
-            //       driver:'',
-            //       redat:''
-            //   })
             setDriver('')
             setRedat('')
               setOpen(true)
@@ -176,9 +167,9 @@ useEffect(()=>{
             </FormWrapper>
             <FormWrapper>
             <FormControl sx={{minWidth: 460 }}>
-            <InputLabel id="driver-select-helper-label">Drivers</InputLabel>
+            <InputLabel id="driver-select-label">Drivers</InputLabel>
         <Select
-          labelId="driver-select-helper-label"
+          labelId="driver-select-label"
           id="driver-select-helper"
           name="driver"
         //   value={driverAndRedat.driver}
@@ -193,9 +184,12 @@ useEffect(()=>{
           <MenuItem value={20}>Twenty</MenuItem>
           <MenuItem value={30}>Thirty</MenuItem> */
           initialDrivers.map((driver)=>(
-            <MenuItem  key = {driver.id} value={driver.firstName}>{`${driver.firstName} ${driver.lastName}`}</MenuItem>
+            <MenuItem  key = {driver.id} value={driver.firstName}>
+                <ListItemText primary = {`${driver.firstName} ${driver.lastName}`}/>
+            </MenuItem>
           ))
           }
+          <AddButton description = "Driver" />
         </Select>
         
         </FormControl>
@@ -213,15 +207,15 @@ useEffect(()=>{
           onChange={handleRedatChange}
         >
           <MenuItem value="">
-            <em>None</em>
+          <em>None</em>
           </MenuItem>
           {
           initialRedats.map((redat)=>(
             <MenuItem  key = {redat.id} value={redat.firstName}>{`${redat.firstName} ${redat.lastName}`}</MenuItem>
           ))
           }
+          <AddButton description = "Redat" />
         </Select>
-        
         </FormControl>
           </FormWrapper>
             <FormWrapper>
