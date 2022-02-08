@@ -16,7 +16,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
-import { Checkbox, ListItemText, OutlinedInput } from '@mui/material';
+import { Checkbox, FormHelperText, ListItemText, OutlinedInput } from '@mui/material';
 import { TimePicker } from '@mui/lab';
 import { useFormik } from 'formik';
 const validate = (values:{description:string}) => {
@@ -58,6 +58,8 @@ const [depPlace, setDepPlace] = React.useState<string[]>([]);
 const [departureDate,setDepartureDate] = useState<Date|null>(null)
 const [departureTime,setDepartureTime] = useState<Date|null>(null)
 const canSave = Boolean(routeId)&&Boolean(departureDate)&&Boolean(departureTime)
+// better if its handled using refs ...
+const [required,setRequired] = useState('')
 const handleDepPlaceChange = (event: SelectChangeEvent<typeof depPlace>) => {
   const {
     target: { value },
@@ -92,7 +94,11 @@ const formik = useFormik({
     },
     validate,
     onSubmit: (values,{resetForm}) => {
-       if(canSave){
+       if(!canSave){
+        setRequired('required')
+        return
+
+       }
         if(!loading){
             setLoading(true)
             timer.current = window.setTimeout(()=>{
@@ -114,9 +120,10 @@ const formik = useFormik({
               setDepPlace([])
               setRoute('')
               setOpen(true)
+              setRequired('')
             },3000)
           }
-       }
+       
     },
   });
   
@@ -196,6 +203,7 @@ const formik = useFormik({
         }}
         renderInput={(params) => <TextField {...params} />}
       />
+      <FormHelperText sx={{color:'red'}}>{required}</FormHelperText>
             </FormWrapper>
         <FormWrapper>
         <TimePicker
@@ -206,6 +214,7 @@ const formik = useFormik({
         }}
         renderInput={(params) => <TextField {...params} />}
       />
+      <FormHelperText sx={{color:'red'}}>{required}</FormHelperText>
         </FormWrapper>
         <FormWrapper>
           <FormControl sx={{width: 460 }}>
@@ -249,7 +258,6 @@ const formik = useFormik({
       </form>
       
       </Box>
-
     </div>
    </LocalizationProvider>
   );

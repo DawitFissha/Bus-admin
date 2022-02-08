@@ -1,6 +1,7 @@
 import React,{useState,useEffect} from 'react';
 import {nanoid} from '@reduxjs/toolkit'
 import { useFormik } from 'formik';
+import {UserRegistration} from '../user/userform'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import {BUS,addBus} from './busSlice'
@@ -15,7 +16,11 @@ import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
 import { ListItemText } from '@mui/material';
 import {AddButton} from '../../Components/addbutton'
-
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 // not a DRY code should be checked later
 
 const RoleData = {
@@ -49,7 +54,22 @@ const FormWrapper = (props:BoxProps)=>{
 }
 
 export const BusRegistration:React.FunctionComponent = () => {
-
+const [redatButton,setRedatButton] = useState(false)
+const [driverButton,setDriverButton]  =useState(false)
+const [opendDialog,setOpenDialog] = useState(false)
+const handleRedatDialogOpen = () => {
+  setOpenDialog(true)
+  setRedatButton(true)
+}
+const handleDriverDialogOpen = () => {
+  setOpenDialog(true)
+  setDriverButton(true)
+}
+const DialogClose = () => {
+  setOpenDialog(false)
+  setDriverButton(false)
+  setRedatButton(false)
+}
 const timer = React.useRef<number>();
 const [open,setOpen] = useState(false)
 const [loading, setLoading] = React.useState(false);
@@ -59,7 +79,7 @@ const initialRedats = users.filter(user=>user.role===RoleData.REDAT) ;
 const [driver,setDriver] = useState('')
 const [redat,setRedat] = useState('')
 
- const handleDriverAndRedatChange = (e:SelectChangeEvent)=>{
+ const handleDriverChange = (e:SelectChangeEvent)=>{
     setDriver(e.target.value)
     }
  const handleRedatChange = (e:SelectChangeEvent)=>{
@@ -175,7 +195,7 @@ useEffect(()=>{
         //   value={driverAndRedat.driver}
         value={driver}
           label="driver"
-          onChange={handleDriverAndRedatChange}
+          onChange={handleDriverChange}
         >
           <MenuItem value="">
             <em>None</em>
@@ -187,7 +207,7 @@ useEffect(()=>{
             </MenuItem>
           ))
           }
-          <AddButton description = "Driver" />
+          <AddButton description = "Driver" handleClick = {handleDriverDialogOpen}/>
         </Select>
         
         </FormControl>
@@ -212,7 +232,7 @@ useEffect(()=>{
             <MenuItem  key = {redat.id} value={redat.firstName}>{`${redat.firstName} ${redat.lastName}`}</MenuItem>
           ))
           }
-          <AddButton description = "Redat" />
+          <AddButton description = "Redat" handleClick = {handleRedatDialogOpen}/>
         </Select>
         </FormControl>
           </FormWrapper>
@@ -232,6 +252,7 @@ useEffect(()=>{
      
             <FormWrapper>
             <Button  
+            // onClick = {()=>(alert('bus'))}
             type="submit"
             disabled = {loading}
             sx={{marginLeft:"35%"}} color="primary" variant="contained" >
@@ -239,6 +260,12 @@ useEffect(()=>{
         </Button>
             </FormWrapper>
             <SaveSuccessfull open={open} handleClose={handleClose} message = 'Bus Successfully Registered' />
+            <Dialog open = {opendDialog} onClose = {DialogClose}>
+              <DialogContent>
+                {driverButton&&<UserRegistration providedRole = {RoleData.DRIVER} DialogClose = {DialogClose} />}
+                {redatButton&&<UserRegistration providedRole = {RoleData.REDAT} DialogClose = {DialogClose} />}
+              </DialogContent>
+            </Dialog>
             
       </form>
       
