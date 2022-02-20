@@ -37,7 +37,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
       border: 0,
     },
   }));
-const busses = useAppSelector(state=>state.busses)
+const busses = useAppSelector(state=>state.busses.busses)
 const users = useAppSelector(state=>state.users)
 const BusState = useAppSelector(state=>state.busStates)
 const dispatch = useAppDispatch();
@@ -54,10 +54,14 @@ const handleBusDelete = (id:string)=>{
     setOpenDialog(true)
     setBusId(id)
   }
-  const oldBusData = useAppSelector(state=>state.busses.find(bus=>bus.id===busId))
+  const oldBusData = useAppSelector(state=>state.busses.busses.find(bus=>bus.id===busId))
 return (
   <>
-      <TableContainer sx={{maxWidth:1000}} component={Paper}>
+      <h2>List of Busses</h2>
+      <div>
+        {
+          busses.length>0?(
+            <TableContainer sx={{maxWidth:1000}} component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -105,6 +109,9 @@ return (
         </TableBody>
       </Table>
     </TableContainer>
+          ):<h3>No registered busses yet</h3>
+        }
+      </div>
     <Dialog open = {opendDialog} onClose = {DialogClose}>
               <DialogContent>
               <BusRegistration
