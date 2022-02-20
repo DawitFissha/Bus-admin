@@ -7,6 +7,7 @@ import {Home} from './Components/home'
 import {RouteRegistration} from './features/route/routeform'
 import {BusRegistration} from './features/bus/busform'
 import {Schedule} from './features/schedule/scheduleform'
+import {BusList} from './features/bus/buslist'
 function App() {
   return (
    <ThemeProvider theme={theme}>
@@ -17,6 +18,7 @@ function App() {
         <Route path='/routes' element = {<RouteRegistration/>}/>
         <Route path='/busses' element = {<BusRegistration/>}/>
         <Route path='/schedules' element = {<Schedule/>}/>
+        <Route path='/buslist' element = {<BusList/>}/>
       </Routes>
       </BrowserRouter>
    

@@ -6,7 +6,7 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import {SCHEDULE,addSchedule} from './scheduleSlice'
+import {addSchedule} from './scheduleSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
 import Box, { BoxProps } from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
