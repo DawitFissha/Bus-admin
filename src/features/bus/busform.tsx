@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import {UserRegistration} from '../user/userform'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import {BUS,addBus} from './busSlice'
+import {BUS,addBus,updateBus} from './busSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
 import Box, { BoxProps } from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
@@ -14,13 +14,11 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
-import { ListItemText } from '@mui/material';
+import { FormHelperText, ListItemText } from '@mui/material';
 import {AddButton} from '../../Components/addbutton'
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+
 // not a DRY code should be checked later
 
 const RoleData = {
@@ -39,10 +37,13 @@ const validate = (values:VALUES_TYPE) => {
       errors.description="Required"
     } 
      if(!values.plateNo) {
-      errors.NoOfSeat = "Required"
+      errors.plateNo = "Plate Number is Required"
     }
      if(!values.NoOfSeat){
-      errors.NoOfSeat = "Required"
+      errors.NoOfSeat = "Nuumber of Seat is Required"
+    }
+    else if(values.NoOfSeat<=0){
+      errors.NoOfSeat = "This value can not be 0 or negative"
     }
     return errors;
   };
@@ -53,7 +54,27 @@ const FormWrapper = (props:BoxProps)=>{
     )
 }
 
-export const BusRegistration:React.FunctionComponent = () => {
+export const BusRegistration = (
+  {
+    providedId,
+    providedDescription,
+    providedPlateNumber,
+    providedRedat,
+    providedDriver,
+    providedNumberOfSeat,
+    providedState,
+    CloseDialog,
+  }:{
+    providedId?:string,
+    providedDescription?:string,
+    providedPlateNumber?:string,
+    providedRedat?:string,
+    providedDriver?:string,
+    providedNumberOfSeat?:number,
+    providedState?:string
+    CloseDialog?:()=>void
+  }
+) => {
 const [redatButton,setRedatButton] = useState(false)
 const [driverButton,setDriverButton]  =useState(false)
 const [opendDialog,setOpenDialog] = useState(false)
@@ -70,25 +91,39 @@ const DialogClose = () => {
   setDriverButton(false)
   setRedatButton(false)
 }
+const isEdit = Boolean(providedDescription)||Boolean(providedNumberOfSeat)||Boolean(providedPlateNumber)||Boolean(providedRedat)||Boolean(providedDriver)
 const timer = React.useRef<number>();
 const [open,setOpen] = useState(false)
 const [loading, setLoading] = React.useState(false);
 const users = useAppSelector(state=>state.users)
 const initialDrivers = users.filter(user=>user.role===RoleData.DRIVER) ;
 const initialRedats = users.filter(user=>user.role===RoleData.REDAT) ;
-const [driver,setDriver] = useState('')
-const [redat,setRedat] = useState('')
-
+// for the default select value  will be checked later
+const providedDriverFirstName = useAppSelector(state=>state.users.find(driver=>driver.id===providedDriver))?.firstName
+const providedDRedatFirstName = useAppSelector(state=>state.users.find(redat=>redat.id===providedRedat))?.firstName
+const providedBusStateDescription = useAppSelector(state=>state.busStates.find(bstate=>bstate.id===providedState))?.description
+const [driver,setDriver] = useState(providedDriver?providedDriverFirstName:'')
+const [redat,setRedat] = useState(providedRedat?providedDRedatFirstName:'')
+const [Bstate,setBState] = useState(providedState?providedBusStateDescription:'')
+const [driverRequired,setDriverRequired] = useState('')
+const [redatRequired,setRedatRequired] = useState('')
  const handleDriverChange = (e:SelectChangeEvent)=>{
     setDriver(e.target.value)
+    setDriverRequired('')
     }
  const handleRedatChange = (e:SelectChangeEvent)=>{
     setRedat(e.target.value)
+    setRedatRequired('')
  }
-
+ const handleBusStateChange = (e:SelectChangeEvent)=>{
+  setBState(e.target.value)
+}
+const busStateId = useAppSelector(state=>state.busStates.find((bstate)=>bstate.description===Bstate))?.id
 const driverId = useAppSelector(state=>state.users.find((user)=>user.firstName===driver))?.id
 const redatId = useAppSelector(state=>state.users.find((user)=>user.firstName===redat))?.id
 const dispatch = useAppDispatch();
+const busState  = useAppSelector(state=>state.busStates)
+const canSave = Boolean(redat)&&Boolean(driver)
 const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
   if (reason === 'clickaway') {
     return;
@@ -105,25 +140,49 @@ useEffect(()=>{
 },[])
   const formik = useFormik({
     initialValues: {
-      description: "",
-      plateNo:"",
-      NoOfSeat:0,
+      description: providedDescription?providedDescription:"",
+      plateNo:providedPlateNumber?providedPlateNumber:"",
+      NoOfSeat:providedNumberOfSeat?providedNumberOfSeat:0,
     },
     validate,
     onSubmit: (values,{resetForm}) => {
+      if(!canSave){
+        setDriverRequired('Driver is Required')
+        setRedatRequired('Redat is Required')
+        return
+      }
           if(!loading){
             setLoading(true)
             timer.current = window.setTimeout(()=>{
               
+              if(isEdit){
+                dispatch(updateBus({
+                  id:providedId as string,
+                  description:values.description,
+                  plateNo:values.plateNo,
+                  driverId,
+                  redatId,
+                  NoOfSeat:values.NoOfSeat,
+                  state:busStateId?busStateId as string:'0',
+                }))
+                // if(CloseDialog){
+                //   CloseDialog()
+                // }
+              }
+              
+             else {
               dispatch(addBus({
                 id:nanoid(),
                 description:values.description,
                 plateNo:values.plateNo,
                 driverId,
                 redatId,
-                NoOfSeat:values.NoOfSeat
+                NoOfSeat:values.NoOfSeat,
+                state:'0',
                 
               }))
+
+             }
               setLoading(false)
               resetForm({values:{
                 description: "",
@@ -131,8 +190,12 @@ useEffect(()=>{
                 NoOfSeat: 0,
                 
               }})
+            
             setDriver('')
             setRedat('')
+            setBState('')
+            setDriverRequired('')
+            setRedatRequired('')
               setOpen(true)
             },3000)
           }
@@ -142,9 +205,9 @@ useEffect(()=>{
 
   return (
     <div style ={{
-      width:"600px",
+      width:isEdit?"500px":'600px',
       marginTop:'5px',
-      marginLeft:'25%',
+      marginLeft:isEdit?'5px':'25%',
       height:'auto',
      background:'#FFFF',
      marginBottom:'5px',
@@ -153,14 +216,13 @@ useEffect(()=>{
         <Box sx={{
            display:'flex',
            flexDirection:'column',
-            marginLeft:'10%'
+           marginLeft:isEdit?'0%':'10%'
        }}>
            <FormWrapper>
-           <RegistrationHeader description = 'Register New Busses' />
+           <RegistrationHeader description = {isEdit?'Edit Bus Information':'Register New Busses'} />
            </FormWrapper>
       <form onSubmit={formik.handleSubmit}>
-     
-            <FormWrapper>
+     <FormWrapper>
             <TextField
         
         id="description"
@@ -192,8 +254,7 @@ useEffect(()=>{
           labelId="driver-select-label"
           id="driver-select-helper"
           name="driver"
-        //   value={driverAndRedat.driver}
-        value={driver}
+          value={driver}
           label="driver"
           onChange={handleDriverChange}
         >
@@ -202,26 +263,25 @@ useEffect(()=>{
           </MenuItem>
        {
           initialDrivers.map((driver)=>(
-            <MenuItem  key = {driver.id} value={driver.firstName}>
+            <MenuItem divider = {true} key = {driver.id} value={driver.firstName}>
                 <ListItemText primary = {`${driver.firstName} ${driver.lastName}`}/>
             </MenuItem>
           ))
           }
           <AddButton description = "Driver" handleClick = {handleDriverDialogOpen}/>
         </Select>
-        
+        <FormHelperText sx={{color:'red'}}>{driverRequired}</FormHelperText>
         </FormControl>
           </FormWrapper>
           <FormWrapper>
             <FormControl sx={{minWidth: 460 }}>
-            <InputLabel id="driver-select-helper-label">Redats</InputLabel>
+            <InputLabel id="redat-select-helper-label">Redats</InputLabel>
         <Select
           labelId="redat-select-helper-label"
-          id="redat-select-helper"
+          id="redat-select"
           name="redat"
-        //   value={driverAndRedat.driver}
-        value = {redat}
           label="redat"
+          value = {redat}
           onChange={handleRedatChange}
         >
           <MenuItem value="">
@@ -229,11 +289,12 @@ useEffect(()=>{
           </MenuItem>
           {
           initialRedats.map((redat)=>(
-            <MenuItem  key = {redat.id} value={redat.firstName}>{`${redat.firstName} ${redat.lastName}`}</MenuItem>
+            <MenuItem divider = {true} key = {redat.id} value={redat.firstName}>{`${redat.firstName} ${redat.lastName}`}</MenuItem>
           ))
           }
           <AddButton description = "Redat" handleClick = {handleRedatDialogOpen}/>
         </Select>
+        <FormHelperText sx={{color:'red'}}>{redatRequired}</FormHelperText>
         </FormControl>
           </FormWrapper>
             <FormWrapper>
@@ -249,17 +310,45 @@ useEffect(()=>{
       />
             </FormWrapper>
         
-     
+            {
+              isEdit&&(
+                <FormWrapper>
+            <FormControl sx={{minWidth: 460 }}>
+            <InputLabel id="state-select-label">State</InputLabel>
+        <Select
+          labelId="state-select-label"
+          id="state-select-helper"
+          name="state"
+          label="state"
+          value = {Bstate}
+          onChange={handleBusStateChange}
+        >
+          <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+       {
+          busState.map((busstate)=>(
+            <MenuItem divider = {true} key = {busstate.id} value={busstate.description}>
+                <ListItemText primary = {busstate.description}/>
+            </MenuItem>
+          ))
+          }
+        </Select>
+        
+       </FormControl>
+          </FormWrapper>
+              )
+            }
             <FormWrapper>
             <Button  
             // onClick = {()=>(alert('bus'))}
             type="submit"
             disabled = {loading}
             sx={{marginLeft:"35%"}} color="primary" variant="contained" >
-          Save
+            {isEdit?'Update':'Save'}
         </Button>
             </FormWrapper>
-            <SaveSuccessfull open={open} handleClose={handleClose} message = 'Bus Successfully Registered' />
+            <SaveSuccessfull open={open} handleClose={handleClose} message = {isEdit? 'Bus Information Updated Successfully':'Bus Successfully Registered'} />
             <Dialog open = {opendDialog} onClose = {DialogClose}>
               <DialogContent>
                 {driverButton&&<UserRegistration providedRole = {RoleData.DRIVER} DialogClose = {DialogClose} />}
