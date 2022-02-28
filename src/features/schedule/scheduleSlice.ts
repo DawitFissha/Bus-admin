@@ -6,15 +6,21 @@ export interface SCHEDULE {
     departureDate:Date|null
     departureTime:Date|null
     Route:string
-    departurePlaces?:string[]
+    departurePlaces?:string[],
+    busId:string
 }
-const initialState:SCHEDULE[] = []
+interface initialStateType {
+    schedules:SCHEDULE[]
+}
+const initialState:initialStateType={
+    schedules:[]
+}
 const scheduleSlice = createSlice({
     name:'schedules',
     initialState,
     reducers:{
         addSchedule:(state,action:PayloadAction<SCHEDULE>)=>{
-            state.push(action.payload)
+            state.schedules.push(action.payload)
         }
     }
 })

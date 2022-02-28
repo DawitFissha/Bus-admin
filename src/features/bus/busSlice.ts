@@ -11,10 +11,19 @@ export interface BUS {
 }
 interface initialStateType {
     busses:BUS[]
-}
+} 
 const initialState:initialStateType = {
     busses:
     [
+        {
+            id:'dummy0Bus',
+            description:'Bus 1',
+            plateNo:'dummy6u5AA',
+            driverId:'dummy0Driver',
+            redatId:'dummy0Redat',
+            NoOfSeat:49, 
+            state:'0',
+            },
         {
         id:'0',
         description:'Bus 1',

@@ -110,6 +110,7 @@ const formik = useFormik({
                 departureDate,
                 departureTime,
                 Route:routeId,
+                busId:'dummy0Bus',
               }))
               setLoading(false)
               resetForm({values:{

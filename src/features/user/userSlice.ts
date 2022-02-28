@@ -10,6 +10,24 @@ role:string
 password:string
 }
 const initialState:USER[] = [
+    {
+        id:'dummy0Driver',
+        firstName:'Dummy',
+        lastName:'Driver',
+        gender:'Male',
+        phoneNumber:"+251927784322",
+        role:'3',
+        password:'12345',
+        },
+        {
+            id:'dummy0Redat',
+            firstName:'Dummy',
+            lastName:'Redat',
+            gender:'Male',
+            phoneNumber:"+251927784322",
+            role:'4',
+            password:'12345',
+            },
 {
 id:'0',
 firstName:'Dawit',
