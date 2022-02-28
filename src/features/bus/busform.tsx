@@ -263,9 +263,9 @@ useEffect(()=>{
           </MenuItem>
        {
           initialDrivers.map((driver)=>(
-            <MenuItem divider = {true} key = {driver.id} value={driver.firstName}>
+            driver.id!=='dummy0Driver'&&(<MenuItem divider = {true} key = {driver.id} value={driver.firstName}>
                 <ListItemText primary = {`${driver.firstName} ${driver.lastName}`}/>
-            </MenuItem>
+            </MenuItem>)
           ))
           }
           <AddButton description = "Driver" handleClick = {handleDriverDialogOpen}/>
@@ -289,7 +289,7 @@ useEffect(()=>{
           </MenuItem>
           {
           initialRedats.map((redat)=>(
-            <MenuItem divider = {true} key = {redat.id} value={redat.firstName}>{`${redat.firstName} ${redat.lastName}`}</MenuItem>
+            redat.id!=='dummy0Redat'&&(<MenuItem divider = {true} key = {redat.id} value={redat.firstName}>{`${redat.firstName} ${redat.lastName}`}</MenuItem>)
           ))
           }
           <AddButton description = "Redat" handleClick = {handleRedatDialogOpen}/>

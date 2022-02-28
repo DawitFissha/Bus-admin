@@ -17,11 +17,11 @@ const initialState:initialStateType = {
     [
         {
             id:'dummy0Bus',
-            description:'Bus 1',
+            description:'Dummy Bus',
             plateNo:'dummy6u5AA',
             driverId:'dummy0Driver',
             redatId:'dummy0Redat',
-            NoOfSeat:49, 
+            NoOfSeat:50, 
             state:'0',
             },
         {

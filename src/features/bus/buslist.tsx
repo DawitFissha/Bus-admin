@@ -76,35 +76,37 @@ return (
         </TableHead>
         <TableBody>
           {busses.map((bus) => (
+           bus.id!=='dummy0Bus'&&(
             <StyledTableRow
-              key={bus.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <StyledTableCell component="th" scope="row">
-                {bus.description}
-              </StyledTableCell>
-              <StyledTableCell align="right">{bus.plateNo}</StyledTableCell>
-              <StyledTableCell align="right">{`${users.find((user)=>user.id===bus.driverId)?.firstName} ${users.find((user)=>user.id===bus.driverId)?.lastName}`}</StyledTableCell>
-              <StyledTableCell align="right">{`${users.find((user)=>user.id===bus.redatId)?.firstName} ${users.find((user)=>user.id===bus.redatId)?.lastName}`}</StyledTableCell>
-              <StyledTableCell align="right">{bus.NoOfSeat}</StyledTableCell>
-              <StyledTableCell align="right">{BusState.find((bs)=>bs.id===bus.state)?.description}</StyledTableCell>
-               <StyledTableCell> 
-                        <Tooltip title={`Delete ${bus.description}`}>
-                        <IconButton color="primary" onClick = {()=>handleBusDelete(bus.id)}>
-                       <DeleteIcon/>
-                   </IconButton>
+            key={bus.id}
+            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+          >
+            <StyledTableCell component="th" scope="row">
+              {bus.description}
+            </StyledTableCell>
+            <StyledTableCell align="right">{bus.plateNo}</StyledTableCell>
+            <StyledTableCell align="right">{`${users.find((user)=>user.id===bus.driverId)?.firstName} ${users.find((user)=>user.id===bus.driverId)?.lastName}`}</StyledTableCell>
+            <StyledTableCell align="right">{`${users.find((user)=>user.id===bus.redatId)?.firstName} ${users.find((user)=>user.id===bus.redatId)?.lastName}`}</StyledTableCell>
+            <StyledTableCell align="right">{bus.NoOfSeat}</StyledTableCell>
+            <StyledTableCell align="right">{BusState.find((bs)=>bs.id===bus.state)?.description}</StyledTableCell>
+             <StyledTableCell> 
+                      <Tooltip title={`Delete ${bus.description}`}>
+                      <IconButton color="primary" onClick = {()=>handleBusDelete(bus.id)}>
+                     <DeleteIcon/>
+                 </IconButton>
+                 
+                      </Tooltip>
+                 <Tooltip title = {`Edit ${bus.description}`}>
+                 <IconButton 
+                 onClick = {()=>{OpenEditBusForm(bus.id)}}
+                 sx = {{marginLeft:'15px'}} color="primary">
+                     <EditIcon/>
+                 </IconButton>
+                 </Tooltip>
 
-                        </Tooltip>
-                   <Tooltip title = {`Edit ${bus.description}`}>
-                   <IconButton 
-                   onClick = {()=>{OpenEditBusForm(bus.id)}}
-                   sx = {{marginLeft:'15px'}} color="primary">
-                       <EditIcon/>
-                   </IconButton>
-                   </Tooltip>
-
-                   </StyledTableCell>     
-            </StyledTableRow>
+                 </StyledTableCell>     
+          </StyledTableRow>
+           )
           ))}
         </TableBody>
       </Table>
