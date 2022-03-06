@@ -14,7 +14,8 @@ export function Home(){
             <Link to="/routes">Routes</Link> |{" "}
             <Link to="/busses">Busses</Link> |{" "}
             <Link to="/schedules">Schedules</Link> |{" "}
-            <Link to="/buslist">Bus List</Link>
+            <Link to="/buslist">Bus List</Link> |{" "}
+            <Link to="/booking">Bookings</Link>
           </nav>
         </div>
       );

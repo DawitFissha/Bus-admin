@@ -8,6 +8,7 @@ import {RouteRegistration} from './features/route/routeform'
 import {BusRegistration} from './features/bus/busform'
 import {Schedule} from './features/schedule/scheduleform'
 import {BusList} from './features/bus/buslist'
+import {Booking} from './features/bookings/booking-form'
 function App() {
   return (
    <ThemeProvider theme={theme}>
@@ -19,6 +20,7 @@ function App() {
         <Route path='/busses' element = {<BusRegistration/>}/>
         <Route path='/schedules' element = {<Schedule/>}/>
         <Route path='/buslist' element = {<BusList/>}/>
+        <Route path='/booking' element = {<Booking/>}/>
       </Routes>
       </BrowserRouter>
    
