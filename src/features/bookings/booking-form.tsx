@@ -4,12 +4,30 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import Divider from '@mui/material/Divider';
 import Select,{SelectChangeEvent} from '@mui/material/Select';
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
+import {format} from 'date-fns'
+import {ROUTE} from '../route/routeSlice'
 import { styled } from '@mui/system';
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { FormControl, InputLabel, MenuItem, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { DatePicker } from '@mui/lab';
+import { useFormik } from 'formik';
+type FormTypes = {firstName:string,lastName:string,phoneNumber:string,seatNumber?:number}
+const validate = (values:FormTypes) => {
+    const errors:Partial<FormTypes> = {}
+
+    if (!values.firstName) {
+      errors.firstName = 'Please Enter First Name of the Passenger'
+    } 
+    else   if (!values.lastName) {
+      errors.lastName = 'Please Enter Lasst Name of the Passenger'
+    } 
+    else   if (!values.phoneNumber) {
+      errors.phoneNumber = 'Please Enter First Name of the Passenger'
+    } 
+    return errors;
+  };
 const TextFieldForBooking = styled(TextField)({
     maxWidth:'200px',
     minWidth:'150px'
@@ -23,11 +41,19 @@ const initialFormValues = {
 export function Booking(){
 const [formValues,setFormValues] = React.useState(initialFormValues)
 const [schedule,setSchedule] = React.useState('')
+const [depaturePlace,setDeparturePlace] = React.useState('')
 const [bookingDate,setBookingDate] = React.useState<Date|null>(new Date())
+const routeId = useAppSelector(state=>state.schedules.schedules.find(sch=>sch.id===schedule))?.Route
+const routeInfo = useAppSelector(state=>state.routes.find(r=>r.id===routeId)) as ROUTE 
+const scheduleInfo = useAppSelector(state=>state.schedules.schedules.find(sch=>sch.id===schedule))
 const handleScheduleChange = (e:SelectChangeEvent)=>{
     setSchedule(e.target.value)
   }
+  const handleDeparturePlaceChange = (e:SelectChangeEvent)=>{
+    setDeparturePlace(e.target.value)
+  }
 const schedules = useAppSelector(state=>state.schedules.schedules)
+const departuerPlaces = scheduleInfo?.departurePlaces
 const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
   const {name,value} = e.target
   setFormValues({
@@ -78,7 +104,7 @@ const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
              </MenuItem>
              {
              schedules.map((schedule)=>(
-               <MenuItem  key = {schedule.id} value={schedule.description}>{schedule.description}</MenuItem>
+               <MenuItem  key = {schedule.id} value={schedule.id}>{schedule.description}</MenuItem>
              ))
              }
            </Select>
@@ -109,49 +135,70 @@ const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
                 <Box >
                     {/* source text field goes here  */}
                     <TextFieldForBooking
+                    disabled
                     id="source-city"
                     name="Source city"
                     label="Source City"
-                    value =''
+                    value ={routeInfo?routeInfo.source:''}
                         />
                 </Box>
                 <Box>
                     {/* destination text field goes here  */}
                     <TextFieldForBooking
+                    disabled
                     id="destination-city"
                     name="Destination"
                     label="Destination City"
-                    value =''
+                    value ={routeInfo?routeInfo.destination:''}
                         />
                 </Box>
                 <Box>
                     {/* departure date text field goes here  */}
                     <TextFieldForBooking
+                    disabled
                     id="departure-date"
                     name="Departure Date"
                     label="Departure Date"
-                    value =''
+                    value ={scheduleInfo?format(scheduleInfo.departureDate as Date,'MM/dd/yyyy'):''}
                         />
                 </Box>
                 <Box>
                     {/* departure time text field goes here  */}
                     <TextFieldForBooking
+                    disabled
                     id="departure-time"
                     name="Departure Time"
                     label="Departure Time"
-                    value =''
+                    value ={scheduleInfo?format(scheduleInfo.departureTime as Date,"h:mm a"):''}
                         />
                 </Box>
              </Box>
              <Box sx={{display:'flex',m:1,paddingTop:'10px'}}>
              <Box sx={{marginLeft:'6px'}}>
-                    {/* departure time text field goes here  */}
-                    <TextFieldForBooking
-                    id="departure-time"
-                    name="Departure Time"
-                    label="Departure Time"
-                    value =''
-                        />
+                    {/* departure place select goes here  */}
+                    <FormControl sx={{maxWidth:'250px',minWidth:'200px',}}>
+           <InputLabel id="departure-place-select-helper-label">Departure Place</InputLabel>
+           
+           <Select
+            
+             labelId="departure-place-select-helper-label"
+             id="departure-place-select-helper"
+             value={depaturePlace}
+             label="Departure Place"
+             onChange={handleDeparturePlaceChange}
+           >
+             <MenuItem value="">
+               <em>None</em>
+             </MenuItem>
+             {
+               // not a great code departure place slice needs some reconstruction
+
+            departuerPlaces?departuerPlaces?.map((dep)=>(
+               <MenuItem  value={dep}>{dep}</MenuItem>
+             )):null
+             }
+           </Select>
+           </FormControl>
                 </Box>
                 <Box sx={{marginLeft:"7px"}}>
                     {/* departure time text field goes here  */}
