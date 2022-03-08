@@ -1,4 +1,5 @@
 import React,{useState} from 'react';
+import { nanoid } from '@reduxjs/toolkit';
 import { useFormik } from 'formik';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -65,13 +66,16 @@ const FormWrapper = (props:BoxProps)=>{
     )
 }
 
-export const UserRegistration:React.FunctionComponent = () => {
+export const UserRegistration = ({providedRole,DialogClose}:{providedRole?:string,DialogClose?:()=>void}) => {
 const timer = React.useRef<number>();
 const [open,setOpen] = useState(false)
 const [loading, setLoading] = React.useState(false);
 const [gender,setGender] = useState('')
 const roles = useAppSelector(state=>state.roles)
-const [roleItem,setRoleItem] = useState('')
+
+
+const providedRoleDescription  = useAppSelector(state=>state.roles.find((role)=>role.id===providedRole))?.description 
+const [roleItem,setRoleItem] = useState(providedRole?providedRoleDescription:'')
 const roleId = useAppSelector(state=>state.roles.find((role)=>role.description===roleItem)) as ROLE
 const [genderError,setGenderError] = useState('')
 const dispatch = useAppDispatch();
@@ -114,11 +118,12 @@ React.useEffect(()=>{
             timer.current = window.setTimeout(()=>{
               setLoading(false)
               dispatch(addUser({
+                id:nanoid(),
                 firstName:values.firstName,
                 lastName:values.lastName,
                 gender,
                 phoneNumber:values.phoneNumber,
-                role:roleId.id,  
+                role:providedRole?providedRole:roleId.id,  
                 password:values.password,
               }))
               resetForm({values:{
@@ -128,9 +133,13 @@ React.useEffect(()=>{
                 password:'',
                 confirmPassword:''
               }})
+             
               setGender('')
               setRoleItem('')
               setOpen(true)
+              if(DialogClose){
+                DialogClose()
+              }
             },3000)
           }
          
@@ -140,9 +149,9 @@ React.useEffect(()=>{
 
   return (
     <div style ={{
-      width:"600px",
-      marginTop:'5px',
-      marginLeft:'25%',
+      width:providedRole?'500px':"600px",
+      marginTop:'2px',
+      marginLeft:providedRole?'5px':'25%',
       height:'auto',
      background:'#FFFF',
      marginBottom:'5px',
@@ -151,7 +160,7 @@ React.useEffect(()=>{
         <Box sx={{
            display:'flex',
            flexDirection:'column',
-            marginLeft:'10%'
+            marginLeft:providedRole?'0%':'10%'
        }}>
            <FormWrapper>
            <RegistrationHeader description = 'Register Users' />
@@ -213,9 +222,10 @@ React.useEffect(()=>{
         />
             </FormWrapper>
             <FormWrapper>
-            <FormControl sx={{minWidth: 120 }}>
+            <FormControl sx={{minWidth: 460 }}>
             <InputLabel id="role-select-helper-label">Role</InputLabel>
         <Select
+          disabled = {Boolean(providedRole)}
           labelId="role-select-helper-label"
           id="role-select-helper"
           value={roleItem}
