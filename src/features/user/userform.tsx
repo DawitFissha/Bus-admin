@@ -5,7 +5,7 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import {USER,addUser} from './userSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
-import Box, { BoxProps } from '@mui/material/Box';
+import Box from '@mui/material/Box';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -19,6 +19,12 @@ import {ROLE}  from '../role/roleSlice'
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
+import {FormWrapper} from '../../Components/formWrapper'
+import PersonIcon from '@mui/icons-material/Person';
+import InputAdornment from '@mui/material/InputAdornment';
+import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
+import PasswordIcon from '@mui/icons-material/Password';
+import WorkspacesIcon from '@mui/icons-material/Workspaces';
 type ERROR_TYPE = Partial<USER> & {confirmPassword?:string}
 // not a DRY code should be checked later
 interface VALUES_TYPE {
@@ -59,12 +65,6 @@ const validate = (values:VALUES_TYPE) => {
   
     return errors;
   };
-const FormWrapper = (props:BoxProps)=>{
-    const {sx,...other} = props
-    return(
-        <Box sx={{p:1,...sx}} {...other}/>
-    )
-}
 
 export const UserRegistration = ({providedRole,DialogClose}:{providedRole?:string,DialogClose?:()=>void}) => {
 const timer = React.useRef<number>();
@@ -176,6 +176,13 @@ React.useEffect(()=>{
           label="first Name"
           value={formik.values.firstName}
           onChange={formik.handleChange}
+          InputProps = {{
+            startAdornment:(
+            <InputAdornment position="start">
+                <PersonIcon fontSize="large" color="primary"/>
+            </InputAdornment>
+            )
+        }}
           error={formik.touched.firstName && Boolean(formik.errors.firstName)}
           helperText={formik.touched.firstName && formik.errors.firstName}
         />
@@ -190,6 +197,13 @@ React.useEffect(()=>{
           label="last Name"
           value={formik.values.lastName}
           onChange={formik.handleChange}
+          InputProps = {{
+            startAdornment:(
+            <InputAdornment position="start">
+                <PersonIcon fontSize="large" color="primary"/>
+            </InputAdornment>
+            )
+        }}
           error={formik.touched.lastName && Boolean(formik.errors.lastName)}
           helperText={formik.touched.lastName && formik.errors.lastName}
         />
@@ -217,6 +231,13 @@ React.useEffect(()=>{
           label="Phone Number"
           value={formik.values.phoneNumber}
           onChange={formik.handleChange}
+          InputProps = {{
+            startAdornment:(
+            <InputAdornment position="start">
+                <LocalPhoneIcon fontSize="large" color="primary"/>
+            </InputAdornment>
+            )
+        }}
           error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
           helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
         />
@@ -231,6 +252,7 @@ React.useEffect(()=>{
           value={roleItem}
           label="Role"
           onChange={handleRoleChange}
+          startAdornment = {<WorkspacesIcon color="primary" fontSize="large"/>}
         >
           <MenuItem value="">
             <em>None</em>
@@ -255,6 +277,13 @@ React.useEffect(()=>{
           type='password'
           value={formik.values.password}
           onChange={formik.handleChange}
+          InputProps = {{
+            startAdornment:(
+            <InputAdornment position="start">
+                <PasswordIcon fontSize="large" color="primary"/>
+            </InputAdornment>
+            )
+        }}
           error={formik.touched.password && Boolean(formik.errors.password)}
           helperText={formik.touched.password && formik.errors.password}
         />
@@ -270,6 +299,13 @@ React.useEffect(()=>{
           label="Confirm Password"
           value={formik.values.confirmPassword}
           onChange={formik.handleChange}
+          InputProps = {{
+            startAdornment:(
+            <InputAdornment position="start">
+                <PasswordIcon fontSize="large" color="primary"/>
+            </InputAdornment>
+            )
+        }}
           error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
           helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
         />

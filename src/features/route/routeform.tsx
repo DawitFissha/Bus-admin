@@ -18,7 +18,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Checkbox from '@mui/material/Checkbox';
 import { ListItemText } from '@mui/material';
-// not a DRY code should be checked later
+import {FormWrapper} from '../../Components/formWrapper'
 
 type VALUES_TYPE  = Required<Pick<ROUTE,'price'|'distance'|'estimatedHour'|'assignedBus'>>
 type ERROR_TYPE  = {
@@ -47,12 +47,6 @@ const validate = (values:VALUES_TYPE) => {
     }
     return errors;
   };
-const FormWrapper = (props:BoxProps)=>{
-    const {sx,...other} = props
-    return(
-        <Box sx={{p:1,...sx}} {...other}/>
-    )
-}
 
 export const RouteRegistration:React.FunctionComponent = () => {
 

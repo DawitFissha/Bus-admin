@@ -19,6 +19,7 @@ import {SaveSuccessfull} from '../../Components/saveSuccess'
 import { Checkbox, FormHelperText, ListItemText, OutlinedInput } from '@mui/material';
 import { TimePicker } from '@mui/lab';
 import { useFormik } from 'formik';
+import {FormWrapper} from '../../Components/formWrapper'
 const validate = (values:{description:string}) => {
     const errors:{description?:string} = {}
     if (!values.description) {
@@ -26,14 +27,6 @@ const validate = (values:{description:string}) => {
     } 
     return errors;
   };
-// not a DRY code should be checked later
-const FormWrapper = (props:BoxProps)=>{
-    const {sx,...other} = props
-    return(
-        <Box sx={{p:1,...sx}} {...other}/>
-    )
-}
-
 export const Schedule:React.FunctionComponent = () => {
     const ITEM_HEIGHT = 48;
     const ITEM_PADDING_TOP = 8;
@@ -131,6 +124,7 @@ const formik = useFormik({
   
   return (
    <LocalizationProvider dateAdapter={AdapterDateFns}>
+     
         <div style ={{
       width:"600px",
       marginTop:'5px',
@@ -261,6 +255,7 @@ const formik = useFormik({
       
       </Box>
     </div>
+    
    </LocalizationProvider>
   );
 };

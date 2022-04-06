@@ -16,6 +16,7 @@ import Tooltip from '@mui/material/Tooltip';
 import {deleteBus} from './busSlice'
 import { Dialog, DialogContent } from '@mui/material';
 import { BusRegistration } from './busform';
+import {fetchBusses} from './busSlice'
 export function BusList(){
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -38,6 +39,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     },
   }));
 const busses = useAppSelector(state=>state.busses.busses)
+const busStatus = useAppSelector(state=>state.busses.status)
 const users = useAppSelector(state=>state.users)
 const BusState = useAppSelector(state=>state.busStates)
 const dispatch = useAppDispatch();
@@ -55,6 +57,12 @@ const handleBusDelete = (id:string)=>{
     setBusId(id)
   }
   const oldBusData = useAppSelector(state=>state.busses.busses.find(bus=>bus.id===busId))
+  React.useEffect(()=>{
+    if(busStatus==='idle'){
+      dispatch(fetchBusses())
+    }
+    console.log(busses.length)
+  },[busStatus,dispatch])
 return (
   <>
       <h2>List of Busses</h2>

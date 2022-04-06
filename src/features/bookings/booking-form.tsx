@@ -20,11 +20,11 @@ const validate = (values:FormTypes) => {
     if (!values.firstName) {
       errors.firstName = 'Please Enter First Name of the Passenger'
     } 
-    else   if (!values.lastName) {
+    if (!values.lastName) {
       errors.lastName = 'Please Enter Lasst Name of the Passenger'
     } 
-    else   if (!values.phoneNumber) {
-      errors.phoneNumber = 'Please Enter First Name of the Passenger'
+    if (!values.phoneNumber) {
+      errors.phoneNumber = 'Please Enter Phone Number of the Passenger'
     } 
     return errors;
   };
@@ -39,6 +39,7 @@ const initialFormValues = {
   phoneNumber:'',
 }
 export function Booking(){
+const timer = React.useRef<number>();
 const [formValues,setFormValues] = React.useState(initialFormValues)
 const [schedule,setSchedule] = React.useState('')
 const [depaturePlace,setDeparturePlace] = React.useState('')
@@ -52,6 +53,7 @@ const handleScheduleChange = (e:SelectChangeEvent)=>{
   const handleDeparturePlaceChange = (e:SelectChangeEvent)=>{
     setDeparturePlace(e.target.value)
   }
+const [loading, setLoading] = React.useState(false);
 const schedules = useAppSelector(state=>state.schedules.schedules)
 const departuerPlaces = scheduleInfo?.departurePlaces
 const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
@@ -61,8 +63,61 @@ const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
     [name]:value
   })
 }
+React.useEffect(()=>{
+  document.title+=` - Book A Ticket`
+  return ()=>{
+    clearTimeout(timer.current)
+  }
+  
+},[])
+const formik = useFormik({
+  initialValues: {
+  seatNumber:1,
+  firstName:'',
+  lastName:'',
+  phoneNumber:'',
+  },
+  validate,
+  onSubmit: (values,{resetForm}) => {
+    //  if(!canSave){
+    //   setRequired('required')
+    //   return
+
+    //  }
+      if(!loading){
+          setLoading(true)
+          timer.current = window.setTimeout(()=>{
+            
+            // dispatch(addSchedule({
+            //   id:nanoid(),
+            //   description:values.description,
+            //   creationDate:format(new Date(),'MM/dd/yyyy'),
+            //   departureDate,
+            //   departureTime,
+            //   Route:routeId,
+            //   departurePlaces:depPlace?depPlace:undefined,
+            //   busId:'dummy0Bus',
+            // }))
+            setLoading(false)
+            resetForm({values:{
+              seatNumber:1,
+              firstName:'',
+              lastName:'',
+              phoneNumber:'',
+            }})
+            
+            setSchedule('')
+            // setOpen(true)
+            // setRequired('')
+          },3000)
+        }
+     
+  },
+});
+
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <form onSubmit={formik.handleSubmit}>
         <div
         style = {{
              width:"850px",
@@ -206,9 +261,13 @@ const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
                     id="seat-number"
                     name="seatNumber"
                     label="Seat Number"
-                    value ={formValues.seatNumber}
                     type='number'
-                    onChange = {handleFormValuesChange}
+                    value={formik.values.seatNumber}
+                    onChange={formik.handleChange}
+                    error={formik.touched.seatNumber && Boolean(formik.errors.seatNumber)}
+                    helperText={formik.touched.seatNumber && formik.errors.seatNumber}
+            
+          
                         />
                 </Box>
                 <Box sx={{alignSelf:'center',marginLeft:'16px'}}>
@@ -233,9 +292,11 @@ const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
                     id="first-name"
                     name="firstName"
                     label="First Name"
-                    value ={formValues.firstName}
-                    onChange = {handleFormValuesChange}
-                        />
+                    value={formik.values.firstName}
+                    onChange={formik.handleChange}
+                    error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                    helperText={formik.touched.firstName && formik.errors.firstName}
+                                    />
                 </Box>
                 <Box sx={{marginLeft:'7px'}}>
             
@@ -243,30 +304,38 @@ const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
                     id="last-name"
                     name="lastName"
                     label="Last Name"
-                    value ={formValues.lastName}
-                    onChange = {handleFormValuesChange}
-                        />
+                    value={formik.values.lastName}
+                    onChange={formik.handleChange}
+                    error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                    helperText={formik.touched.lastName && formik.errors.lastName}
+                                    />
                 </Box>
                 <Box sx={{marginLeft:'7px'}}>
                     <TextFieldForBooking
                     id="phone-number"
                     name="phoneNumber"
                     label="Phone Number"
-                    value ={formValues.phoneNumber}
-                    onChange = {handleFormValuesChange}
-                        />
+                    value={formik.values.phoneNumber}
+                    onChange={formik.handleChange}
+                    error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                    helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                                    />
                 </Box>
                  </Box>
                  <Divider/>
               <Box sx={{p:2}}>
-              <Button sx={{
+              <Button 
+              type="submit"
+              sx={{
                    display:'block',
                    marginLeft: 'auto',
                    marginRight: 'auto',
                    width:"150px"
                  }}> Book Now </Button>
               </Box>
+              
         </div>
+        </form>
         </LocalizationProvider>
     )
 }

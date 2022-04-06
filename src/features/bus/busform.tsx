@@ -18,8 +18,7 @@ import { FormHelperText, ListItemText } from '@mui/material';
 import {AddButton} from '../../Components/addbutton'
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-
-// not a DRY code should be checked later
+import {FormWrapper} from '../../Components/formWrapper'
 
 const RoleData = {
     DRIVER:'3',
@@ -47,13 +46,6 @@ const validate = (values:VALUES_TYPE) => {
     }
     return errors;
   };
-const FormWrapper = (props:BoxProps)=>{
-    const {sx,...other} = props
-    return(
-        <Box sx={{p:1,...sx}} {...other}/>
-    )
-}
-
 export const BusRegistration = (
   {
     providedId,
