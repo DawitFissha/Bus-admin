@@ -1,7 +1,7 @@
 import axios from "axios";
 import authHeader from './auth-header';
 const API_URL = "https://melabus.herokuapp.com/";
-
+axios.defaults.withCredentials = true
 class AuthService {
   login(phonenumber, organizationcode, password) {
     return axios
@@ -20,6 +20,18 @@ class AuthService {
   logout() {
     localStorage.removeItem("user");
   }
+  addUser(newUser){
+    return axios.post(`${API_URL}registerorganizationuser`,newUser, { headers: authHeader() })
+  }
+
+  addRoute(newRoute){
+    return axios.post(`${API_URL}registerorganizationuser`,newRoute, { headers: authHeader() })
+  }
+
+addBus(newBus){
+    return axios.post(`${API_URL}registerbus`,newBus, { headers: authHeader() })
+  }
+
   updateRouteInfo(source, destination, tarif, estimatedhour, distance, id) {
     console.log(`${source}`)
     return axios.put(API_URL + `updaterouteinfo/${id}`, {

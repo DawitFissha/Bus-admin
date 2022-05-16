@@ -1,6 +1,6 @@
 import axios from 'axios';
 import authHeader from './auth-header';
-
+axios.defaults.withCredentials = true
 const API_URL = "https://melabus.herokuapp.com/";
 
 class UserService {
@@ -13,7 +13,9 @@ class UserService {
   getBusList() {
     return axios.get(API_URL + 'getallorganizationbus',  { headers: authHeader() });
   }
-
+  getUserList() {
+    return axios.get(API_URL + 'getallorganizationuser', { headers: authHeader() });
+  }
   getBookedList() {
     return axios.get(API_URL + 'bookedList', { headers: authHeader() });
   }

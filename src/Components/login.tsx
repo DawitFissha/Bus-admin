@@ -16,6 +16,8 @@ import Avatar from '@mui/material/Avatar'
 import AuthService from "../services/auth.service";
 import Alert from '@mui/material/Alert'
 import {useNavigate} from 'react-router-dom'
+import {ValidatePhoneNumber} from '../utils/regex-validators'
+// import {useCookies} from 'react-cookie'
 interface LOGIN_VALUES {
     phoneNumber:string
     password:string
@@ -25,12 +27,20 @@ const validate = (values:LOGIN_VALUES)=>{
     if(!values.phoneNumber){
         errors.phoneNumber = "Phone number is Required"
     }
+    else if(!ValidatePhoneNumber(values.phoneNumber)){
+        errors.phoneNumber = "Invalid Phone Number";
+        }
+    else if (values.phoneNumber.length>10) {
+            errors.phoneNumber = "Phone Number Can't Excede 10 digits";
+          }
     if(!values.password){
         errors.password = "Password is Required"
     }
+   
     return errors
 }
 export const Login = ()=>{
+// const [cookies,setCookie]= useCookies(["user"])
 const navigate = useNavigate()
 const [loginState,setLoginState] = React.useState({
   organizationCode: localStorage.getItem('orgCode')? localStorage.getItem('orgCode')?.replace(/"/g, '') : "",
@@ -55,6 +65,9 @@ const handleClickShowPassword = ()=>{
                     ()=>{
                         console.log('login successfull')
                         setLoginState({...loginState,loading:false})
+                        // setCookie("user", `${token}`, {
+                        //     path: "/"
+                        //   });
                         navigate('/')
                     },
                     (error:any)=>{

@@ -3,7 +3,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import { useFormik } from 'formik';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import {USER,addUser} from './userSlice'
+import {USER} from './userSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
 import Box from '@mui/material/Box';
 import Radio from '@mui/material/Radio';
@@ -15,7 +15,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormHelperText from '@mui/material/FormHelperText';
-import {ROLE}  from '../role/roleSlice'
+import {ROLE} from '../../utils/Constants/roles'
+import {roles} from '../../utils/Constants/roles'
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
@@ -25,6 +26,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import PasswordIcon from '@mui/icons-material/Password';
 import WorkspacesIcon from '@mui/icons-material/Workspaces';
+import {ValidatePhoneNumber} from '../../utils/regex-validators'
+import {addUsers,fetchUsers} from './userSlice'
+import Alert from '@mui/material/Alert'
 type ERROR_TYPE = Partial<USER> & {confirmPassword?:string}
 // not a DRY code should be checked later
 interface VALUES_TYPE {
@@ -37,21 +41,25 @@ interface VALUES_TYPE {
 const validate = (values:VALUES_TYPE) => {
     const errors:ERROR_TYPE = {};
     if (!values.firstName) {
-      errors.firstName = 'Required';
+      errors.firstname = 'Required';
     } else if (values.firstName.length > 15) {
-      errors.firstName = 'Must be 15 characters or less';
+      errors.firstname = 'Must be 15 characters or less';
     }
   
     if (!values.lastName) {
-      errors.lastName = 'Required';
+      errors.lastname = 'Required';
     } else if (values.lastName.length > 20) {
-      errors.lastName = 'Must be 20 characters or less';
+      errors.lastname = 'Must be 20 characters or less';
     }
   
     if (!values.phoneNumber) {
-      errors.phoneNumber = 'Required';
-    } else if (values.phoneNumber.length>13) {
-      errors.phoneNumber = 'Invalid Phone Number';
+      errors.phonenumber = 'Required';
+    }
+     else if (values.phoneNumber.length>10) {
+      errors.phonenumber = "Phone Number Can't Excede 10 digits";
+    }
+    else if(!ValidatePhoneNumber(values.phoneNumber)) {
+      errors.phonenumber = "Invalid Phone Number";
     }
     if(!values.password){
         errors.password = 'Required';
@@ -69,15 +77,14 @@ const validate = (values:VALUES_TYPE) => {
 export const UserRegistration = ({providedRole,DialogClose}:{providedRole?:string,DialogClose?:()=>void}) => {
 const timer = React.useRef<number>();
 const [open,setOpen] = useState(false)
-const [loading, setLoading] = React.useState(false);
 const [gender,setGender] = useState('')
-const roles = useAppSelector(state=>state.roles)
-
-
-const providedRoleDescription  = useAppSelector(state=>state.roles.find((role)=>role.id===providedRole))?.description 
+const providedRoleDescription  = roles.find((role)=>role.id===providedRole)?.description 
 const [roleItem,setRoleItem] = useState(providedRole?providedRoleDescription:'')
-const roleId = useAppSelector(state=>state.roles.find((role)=>role.description===roleItem)) as ROLE
+const roleId = roles.find((role)=>role.description===roleItem)?.id as string 
 const [genderError,setGenderError] = useState('')
+ 
+const [loading, setLoading] = React.useState(false);
+const [adduserError,setAddUserError] = useState('')
 const dispatch = useAppDispatch();
 const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
   if (reason === 'clickaway') {
@@ -93,11 +100,16 @@ const handleRoleChange = (e:SelectChangeEvent)=>{
   setRoleItem(e.target.value)
 }
 React.useEffect(()=>{
-    document.title+=` - User Registration`
-    return ()=>{
-      clearTimeout(timer.current)
-    }
-},[])
+    document.title +=` - User Registration`
+    // if(userStatus==='idle'){
+    //   dispatch(fetchUsers())
+      
+    // }
+    // return ()=>{
+    //   clearTimeout(timer.current)
+    // }
+},[/*userStatus,dispatch*/])
+
   const formik = useFormik({
     initialValues: {
       firstName: '',
@@ -107,25 +119,33 @@ React.useEffect(()=>{
       confirmPassword:''
     },
     validate,
-    onSubmit: (values,{resetForm}) => {
+    onSubmit: async (values,{resetForm}) => {
       // if(gender===''){
       //   setGender('select Gender Please')
       //   console.log(genderError)
       // }
         // else {
+      
           if(!loading){
+            
             setLoading(true)
-            timer.current = window.setTimeout(()=>{
-              setLoading(false)
-              dispatch(addUser({
-                id:nanoid(),
-                firstName:values.firstName,
-                lastName:values.lastName,
-                gender,
-                phoneNumber:values.phoneNumber,
-                role:providedRole?providedRole:roleId.id,  
-                password:values.password,
-              }))
+            // timer.current = window.setTimeout(()=>{
+              
+            try {
+              await dispatch(addUsers(
+                {
+                  firstname:values.firstName,
+                  lastname:values.lastName,
+                  gender,
+                  phonenumber:values.phoneNumber,
+                  userrole:providedRole?providedRole:roleId,  
+                  password:values.password,
+                  confirmpassword:values.confirmPassword,
+                }
+              )).unwrap()
+
+              
+
               resetForm({values:{
                 firstName: '',
                 lastName: '',
@@ -137,10 +157,24 @@ React.useEffect(()=>{
               setGender('')
               setRoleItem('')
               setOpen(true)
-              if(DialogClose){
+            if(DialogClose){
                 DialogClose()
               }
-            },3000)
+          
+            }
+            catch (err:any) {
+              console.log(err.message)
+              const resMessage =
+              (err.response &&
+                err.response.data &&
+                err.response.data.message) ||
+                err.message ||
+                err.toString();
+                setAddUserError(resMessage)
+            }
+            finally {
+              setLoading(false)
+            }
           }
          
         
@@ -217,8 +251,8 @@ React.useEffect(()=>{
                  aria-labelledby="gender-radio-buttons-group-label"
                  name="gender-radio-buttons-group"
       >
-        <FormControlLabel value="F" control={<Radio />} label="Female" />
-        <FormControlLabel value="M" control={<Radio />} label="Male" />
+        <FormControlLabel value="male" control={<Radio />} label="Female" />
+        <FormControlLabel value="female" control={<Radio />} label="Male" />
         
         
       </RadioGroup>
@@ -320,6 +354,11 @@ React.useEffect(()=>{
             </FormWrapper>
             <SaveSuccessfull open={open} handleClose={handleClose} message = 'User Successfully Registered' />
       </form>
+      {adduserError&&(<FormWrapper>
+            <Alert sx ={{width:'450px',fontSize:"medium"}} severity="error">
+            <strong>{adduserError}</strong> , Please try again
+            </Alert>
+            </FormWrapper>)}
       </Box>
     </div>
   );

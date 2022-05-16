@@ -9,14 +9,13 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import { useFormik } from 'formik'
 import {useNavigate} from 'react-router-dom'
-
-const orgRegEx = new RegExp('^[0-9]+$')
+import {ValidateOrgCode} from '../utils/regex-validators'
 const validate = (values:{OrganizationCode:string})=>{
     const errors:{OrganizationCode?:string} = {}
     if(!values.OrganizationCode){
         errors.OrganizationCode = "This field can't be empty"
     }
-    else if(!orgRegEx.test(values.OrganizationCode)){
+    else if(!ValidateOrgCode(values.OrganizationCode)){
         errors.OrganizationCode = "Only Numbers are allowed"
     }
     else if(values.OrganizationCode.length>10){
