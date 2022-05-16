@@ -6,6 +6,7 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
+import {InputProps} from '@mui/material/Input'
 import {addSchedule} from './scheduleSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
 import Box, { BoxProps } from '@mui/material/Box';
@@ -16,9 +17,14 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
-import { Checkbox, FormHelperText, ListItemText, OutlinedInput } from '@mui/material';
+import { Checkbox, FormHelperText, InputAdornment, ListItemText, OutlinedInput } from '@mui/material';
 import { TimePicker } from '@mui/lab';
 import { useFormik } from 'formik';
+import {FormWrapper} from '../../Components/formWrapper'
+import DescriptionIcon from '@mui/icons-material/Description';
+import RouteIcon from '@mui/icons-material/Route';
+import DepartureBoardIcon from '@mui/icons-material/DepartureBoard';
+import SvgIcon from '@mui/material/SvgIcon';
 const validate = (values:{description:string}) => {
     const errors:{description?:string} = {}
     if (!values.description) {
@@ -26,14 +32,6 @@ const validate = (values:{description:string}) => {
     } 
     return errors;
   };
-// not a DRY code should be checked later
-const FormWrapper = (props:BoxProps)=>{
-    const {sx,...other} = props
-    return(
-        <Box sx={{p:1,...sx}} {...other}/>
-    )
-}
-
 export const Schedule:React.FunctionComponent = () => {
     const ITEM_HEIGHT = 48;
     const ITEM_PADDING_TOP = 8;
@@ -131,6 +129,7 @@ const formik = useFormik({
   
   return (
    <LocalizationProvider dateAdapter={AdapterDateFns}>
+     
         <div style ={{
       width:"600px",
       marginTop:'5px',
@@ -160,13 +159,18 @@ const formik = useFormik({
       <form onSubmit={formik.handleSubmit}>
       <FormWrapper>
             <TextField
-        
         id="description"
         name="description"
         label="Description"
-        
         value={formik.values.description}
         onChange={formik.handleChange}
+        InputProps = {{
+          startAdornment:(
+          <InputAdornment position="start">
+              <DescriptionIcon sx={{fontSize:"35px"}} color="primary"/>
+          </InputAdornment>
+          )
+      }}
         error={formik.touched.description && Boolean(formik.errors.description)}
         helperText={formik.touched.description && formik.errors.description}
       />
@@ -181,6 +185,11 @@ const formik = useFormik({
           value={route}
           label="route"
           onChange={handleRouteChagne}
+          startAdornment = {
+            <InputAdornment position="start">
+            <RouteIcon color="primary" sx={{fontSize:"35px"}}/>
+            </InputAdornment>
+          }
         >
           <MenuItem value="">
             <em>None</em>
@@ -203,7 +212,19 @@ const formik = useFormik({
             onChange={(newValue) => {
             setDepartureDate(newValue);
         }}
-        renderInput={(params) => <TextField {...params} />}
+        renderInput={(params) =>{
+          if(params.InputProps!==undefined){
+            params.InputProps.startAdornment = (
+              <InputAdornment position="start">
+              <DepartureBoardIcon color="primary" sx={{fontSize:"35px"}}/>
+              </InputAdornment>
+            )
+          }
+          return(
+            <TextField {...params} />
+          )
+        }}
+        
       />
       <FormHelperText sx={{color:'red'}}>{required}</FormHelperText>
             </FormWrapper>
@@ -214,7 +235,18 @@ const formik = useFormik({
         onChange={(newValue) => {
           setDepartureTime(newValue);
         }}
-        renderInput={(params) => <TextField {...params} />}
+        renderInput={(params) =>{
+          if(params.InputProps!==undefined){
+            params.InputProps.startAdornment = (
+              <InputAdornment position="start">
+              <DepartureBoardIcon color="primary" sx={{fontSize:"35px"}}/>
+              </InputAdornment>
+            )
+          }
+          return(
+            <TextField {...params} />
+          )
+        }}
       />
       <FormHelperText sx={{color:'red'}}>{required}</FormHelperText>
         </FormWrapper>
@@ -230,6 +262,13 @@ const formik = useFormik({
           input={<OutlinedInput id="select-multiple" label="Departure Place" />}
           renderValue={(selected)=>selected.join(', ')}
           MenuProps={MenuProps}
+          startAdornment = {
+            <InputAdornment position="start">
+              <SvgIcon color="primary" sx={{fontSize:"35px"}}>
+                    <path fill="currentColor" d="M22 7V16C22 16.71 21.62 17.36 21 17.72V19.25C21 19.66 20.66 20 20.25 20H19.75C19.34 20 19 19.66 19 19.25V18H12V19.25C12 19.66 11.66 20 11.25 20H10.75C10.34 20 10 19.66 10 19.25V17.72C9.39 17.36 9 16.71 9 16V7C9 4 12 4 15.5 4S22 4 22 7M13 15C13 14.45 12.55 14 12 14S11 14.45 11 15 11.45 16 12 16 13 15.55 13 15M20 15C20 14.45 19.55 14 19 14S18 14.45 18 15 18.45 16 19 16 20 15.55 20 15M20 7H11V11H20V7M7 9.5C6.97 8.12 5.83 7 4.45 7.05C3.07 7.08 1.97 8.22 2 9.6C2.03 10.77 2.86 11.77 4 12V20H5V12C6.18 11.76 7 10.71 7 9.5Z" />
+              </SvgIcon>
+            </InputAdornment>
+            }
         >
           {
           departurePlaces?
@@ -261,6 +300,7 @@ const formik = useFormik({
       
       </Box>
     </div>
+    
    </LocalizationProvider>
   );
 };

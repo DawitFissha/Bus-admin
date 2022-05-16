@@ -13,9 +13,9 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Tooltip from '@mui/material/Tooltip';
-import {deleteBus} from './busSlice'
 import { Dialog, DialogContent } from '@mui/material';
 import { BusRegistration } from './busform';
+import {fetchBusses} from './busSlice'
 export function BusList(){
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -38,12 +38,13 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     },
   }));
 const busses = useAppSelector(state=>state.busses.busses)
-const users = useAppSelector(state=>state.users)
+const busStatus = useAppSelector(state=>state.busses.status)
+const users = useAppSelector(state=>state.users.users)
 const BusState = useAppSelector(state=>state.busStates)
 const dispatch = useAppDispatch();
 const [busId,setBusId] = React.useState<string|null>(null)
 const handleBusDelete = (id:string)=>{
-    dispatch(deleteBus(id))
+    // dispatch(deleteBus(id))
     // console.log('deleted ?')
 }
   const [opendDialog,setOpenDialog] = React.useState(false)
@@ -54,7 +55,14 @@ const handleBusDelete = (id:string)=>{
     setOpenDialog(true)
     setBusId(id)
   }
-  const oldBusData = useAppSelector(state=>state.busses.busses.find(bus=>bus.id===busId))
+  const oldBusData = useAppSelector(state=>state.busses.busses.find(bus=>bus._id===busId))
+  React.useEffect(()=>{
+    if(busStatus==='idle'){
+      dispatch(fetchBusses())
+    }
+    
+  },[busStatus,dispatch])
+  console.log(busses)
 return (
   <>
       <h2>List of Busses</h2>
@@ -65,7 +73,7 @@ return (
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>Description</StyledTableCell>
+            <StyledTableCell>Side Number</StyledTableCell>
             <StyledTableCell align="right">Plate Number</StyledTableCell>
             <StyledTableCell align="right">Driver</StyledTableCell>
             <StyledTableCell align="right">Redat</StyledTableCell>
@@ -75,30 +83,30 @@ return (
           </TableRow>
         </TableHead>
         <TableBody>
-          {busses.map((bus) => (
-           bus.id!=='dummy0Bus'&&(
+          {busses.map((bus:any) => (
+           bus._id!=='dummy0Bus'&&(
             <StyledTableRow
-            key={bus.id}
+            key={bus._id}
             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
           >
             <StyledTableCell component="th" scope="row">
-              {bus.description}
+              {bus.busSideNo}
             </StyledTableCell>
-            <StyledTableCell align="right">{bus.plateNo}</StyledTableCell>
+            <StyledTableCell align="right">{bus.busPlateNo}</StyledTableCell>
             <StyledTableCell align="right">{`${users.find((user)=>user.id===bus.driverId)?.firstName} ${users.find((user)=>user.id===bus.driverId)?.lastName}`}</StyledTableCell>
             <StyledTableCell align="right">{`${users.find((user)=>user.id===bus.redatId)?.firstName} ${users.find((user)=>user.id===bus.redatId)?.lastName}`}</StyledTableCell>
-            <StyledTableCell align="right">{bus.NoOfSeat}</StyledTableCell>
-            <StyledTableCell align="right">{BusState.find((bs)=>bs.id===bus.state)?.description}</StyledTableCell>
+            <StyledTableCell align="right">{bus.totalNoOfSit}</StyledTableCell>
+            <StyledTableCell align="right">{bus.busState}</StyledTableCell>
              <StyledTableCell> 
-                      <Tooltip title={`Delete ${bus.description}`}>
-                      <IconButton color="primary" onClick = {()=>handleBusDelete(bus.id)}>
+                      <Tooltip title={`Delete ${bus.sideNo}`}>
+                      <IconButton color="primary" onClick = {()=>handleBusDelete(bus._id)}>
                      <DeleteIcon/>
                  </IconButton>
                  
                       </Tooltip>
-                 <Tooltip title = {`Edit ${bus.description}`}>
+                 <Tooltip title = {`Edit ${bus.sideNo}`}>
                  <IconButton 
-                 onClick = {()=>{OpenEditBusForm(bus.id)}}
+                 onClick = {()=>{OpenEditBusForm(bus._id)}}
                  sx = {{marginLeft:'15px'}} color="primary">
                      <EditIcon/>
                  </IconButton>
@@ -119,11 +127,11 @@ return (
               <BusRegistration
               CloseDialog = {DialogClose}
               providedId = {oldBusData?.id}
-              providedDescription={oldBusData?.description}
+              providedsideNo={oldBusData?.sideNo}
               providedDriver = {oldBusData?.driverId}
               providedRedat = {oldBusData?.redatId}
-              providedNumberOfSeat = {oldBusData?.NoOfSeat}
-              providedPlateNumber = {oldBusData?.plateNo}
+              providedNumberOfSeat = {oldBusData?.totalNoOfSit}
+              providedPlateNumber = {oldBusData?.busPlateNo}
               providedState = {oldBusData?.state}
               />
               </DialogContent>

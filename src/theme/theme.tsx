@@ -15,12 +15,12 @@ export const theme = createTheme({
                root:{
                    fontSize:16,
                    textTransform:'none',
-                   backgroundColor:'#087436',
+                   backgroundColor:'#2E86C1',
                    color:'white',
                    borderColor: '#0063cc',
                 //    border:'1px solid',
                    '&:hover':{
-                    background:'#087436',
+                    background:'#2E86C1',
                    },
                }
            },

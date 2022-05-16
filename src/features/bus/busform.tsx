@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import {UserRegistration} from '../user/userform'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import {BUS,addBus,updateBus} from './busSlice'
+import {addBusses} from './busSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
 import Box, { BoxProps } from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
@@ -14,27 +14,34 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
-import { FormHelperText, ListItemText } from '@mui/material';
+import { FormHelperText, InputAdornment, ListItemText } from '@mui/material';
 import {AddButton} from '../../Components/addbutton'
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-
-// not a DRY code should be checked later
-
+import {FormWrapper} from '../../Components/formWrapper'
+import DescriptionIcon from '@mui/icons-material/Description';
+import AbcIcon from '@mui/icons-material/Abc';
+import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
+import NumbersIcon from '@mui/icons-material/Numbers';
+import {fetchUsers} from '../user/userSlice'
 const RoleData = {
     DRIVER:'3',
     REDAT:'4',
 }
 
-type VALUES_TYPE  = Pick<BUS,'description'|'plateNo'|'NoOfSeat'>
-type ERROR_TYPE  = {
-  [Property in keyof VALUES_TYPE]+?:string
-}
+// type VALUES_TYPE  = Pick<BUS,'sideNo'|'plateNo'|'NoOfSeat'>
+// type ERROR_TYPE  = {
+//   [Property in keyof VALUES_TYPE]+?:string
+// }
 
-const validate = (values:VALUES_TYPE) => {
-    const errors:ERROR_TYPE = {}
+const validate = (values:any) => {
+    const errors:any = {}
     if (!values.description) {
       errors.description="Required"
+    }
+    if (!values.sideNo) {
+      errors.sideNo="Required"
     } 
      if(!values.plateNo) {
       errors.plateNo = "Plate Number is Required"
@@ -47,17 +54,10 @@ const validate = (values:VALUES_TYPE) => {
     }
     return errors;
   };
-const FormWrapper = (props:BoxProps)=>{
-    const {sx,...other} = props
-    return(
-        <Box sx={{p:1,...sx}} {...other}/>
-    )
-}
-
 export const BusRegistration = (
   {
     providedId,
-    providedDescription,
+    providedsideNo,
     providedPlateNumber,
     providedRedat,
     providedDriver,
@@ -66,7 +66,7 @@ export const BusRegistration = (
     CloseDialog,
   }:{
     providedId?:string,
-    providedDescription?:string,
+    providedsideNo?:string,
     providedPlateNumber?:string,
     providedRedat?:string,
     providedDriver?:string,
@@ -91,39 +91,40 @@ const DialogClose = () => {
   setDriverButton(false)
   setRedatButton(false)
 }
-const isEdit = Boolean(providedDescription)||Boolean(providedNumberOfSeat)||Boolean(providedPlateNumber)||Boolean(providedRedat)||Boolean(providedDriver)
-const timer = React.useRef<number>();
+const isEdit = Boolean(providedsideNo)||Boolean(providedNumberOfSeat)||Boolean(providedPlateNumber)||Boolean(providedRedat)||Boolean(providedDriver)
+
 const [open,setOpen] = useState(false)
 const [loading, setLoading] = React.useState(false);
-const users = useAppSelector(state=>state.users)
+const users = useAppSelector(state=>state.users.users)
+const userStatus = useAppSelector(state=>state.users.status)
 const initialDrivers = users.filter(user=>user.role===RoleData.DRIVER) ;
 const initialRedats = users.filter(user=>user.role===RoleData.REDAT) ;
 // for the default select value  will be checked later
-const providedDriverFirstName = useAppSelector(state=>state.users.find(driver=>driver.id===providedDriver))?.firstName
-const providedDRedatFirstName = useAppSelector(state=>state.users.find(redat=>redat.id===providedRedat))?.firstName
-const providedBusStateDescription = useAppSelector(state=>state.busStates.find(bstate=>bstate.id===providedState))?.description
+const providedDriverFirstName = useAppSelector(state=>state.users.users.find(driver=>driver.id===providedDriver))?.firstName
+const providedDRedatFirstName = useAppSelector(state=>state.users.users.find(redat=>redat.id===providedRedat))?.firstName
+const providedBusStatesideNo = useAppSelector(state=>state.busStates.find(bstate=>bstate.id===providedState))?.description
 const [driver,setDriver] = useState(providedDriver?providedDriverFirstName:'')
 const [redat,setRedat] = useState(providedRedat?providedDRedatFirstName:'')
-const [Bstate,setBState] = useState(providedState?providedBusStateDescription:'')
-const [driverRequired,setDriverRequired] = useState('')
-const [redatRequired,setRedatRequired] = useState('')
+const [Bstate,setBState] = useState(providedState?providedBusStatesideNo:'')
+// const [driverRequired,setDriverRequired] = useState('')
+// const [redatRequired,setRedatRequired] = useState('')
  const handleDriverChange = (e:SelectChangeEvent)=>{
     setDriver(e.target.value)
-    setDriverRequired('')
+    // setDriverRequired('')
     }
  const handleRedatChange = (e:SelectChangeEvent)=>{
     setRedat(e.target.value)
-    setRedatRequired('')
+    // setRedatRequired('')
  }
  const handleBusStateChange = (e:SelectChangeEvent)=>{
   setBState(e.target.value)
 }
 const busStateId = useAppSelector(state=>state.busStates.find((bstate)=>bstate.description===Bstate))?.id
-const driverId = useAppSelector(state=>state.users.find((user)=>user.firstName===driver))?.id
-const redatId = useAppSelector(state=>state.users.find((user)=>user.firstName===redat))?.id
+const driverId = useAppSelector(state=>state.users.users.find((user)=>user.firstName===driver))?.id
+const redatId = useAppSelector(state=>state.users.users.find((user)=>user.firstName===redat))?.id
 const dispatch = useAppDispatch();
 const busState  = useAppSelector(state=>state.busStates)
-const canSave = Boolean(redat)&&Boolean(driver)
+// const canSave = Boolean(redat)&&Boolean(driver)
 const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
   if (reason === 'clickaway') {
     return;
@@ -133,59 +134,64 @@ const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
 
 useEffect(()=>{
     document.title+=` - Bus Registration`
-    return ()=>{
-      clearTimeout(timer.current)
+    if(userStatus === 'idle'){
+      dispatch(fetchUsers())
     }
-    
-},[])
+
+  },[])
   const formik = useFormik({
     initialValues: {
-      description: providedDescription?providedDescription:"",
+      serviceYear:0,
+      sideNo: providedsideNo?providedsideNo:"",
       plateNo:providedPlateNumber?providedPlateNumber:"",
       NoOfSeat:providedNumberOfSeat?providedNumberOfSeat:0,
     },
     validate,
-    onSubmit: (values,{resetForm}) => {
-      if(!canSave){
-        setDriverRequired('Driver is Required')
-        setRedatRequired('Redat is Required')
-        return
-      }
+    onSubmit: async (values,{resetForm}) => {
+      // if(!canSave){
+      //   setDriverRequired('Driver is Required')
+      //   setRedatRequired('Redat is Required')
+      //   return
+      // }
           if(!loading){
             setLoading(true)
-            timer.current = window.setTimeout(()=>{
+            
               
-              if(isEdit){
-                dispatch(updateBus({
-                  id:providedId as string,
-                  description:values.description,
-                  plateNo:values.plateNo,
-                  driverId,
-                  redatId,
-                  NoOfSeat:values.NoOfSeat,
-                  state:busStateId?busStateId as string:'0',
-                }))
-                // if(CloseDialog){
-                //   CloseDialog()
-                // }
-              }
+              // if(isEdit){
+              //   dispatch(updateBus({
+              //     id:providedId as string,
+              //     sideNo:values.sideNo,
+              //     plateNo:values.plateNo,
+              //     driverId,
+              //     redatId,
+              //     NoOfSeat:values.NoOfSeat,
+              //     state:busStateId?busStateId as string:'0',
+              //   }))
+              //   // if(CloseDialog){
+              //   //   CloseDialog()
+              //   // }
+              // }
               
-             else {
-              dispatch(addBus({
-                id:nanoid(),
-                description:values.description,
-                plateNo:values.plateNo,
-                driverId,
-                redatId,
-                NoOfSeat:values.NoOfSeat,
-                state:'0',
-                
-              }))
+            //  else {
+             try {
+              await dispatch(addBusses({
+                bussideno:values.sideNo,
+                busplateno:values.plateNo,
+                bus_state:"Active",
+                // driverId,
+                // redatId,
+                redatid:"6252cbbc9c79a5ce22d5f206",
+                driverid:"6252cb4f9c79a5ce22d5f204",
 
-             }
-              setLoading(false)
+                totalsit:values.NoOfSeat,
+                serviceyear:values.serviceYear,
+                }))
+
+            //  }
+              
               resetForm({values:{
-                description: "",
+                serviceYear:0,
+                sideNo: "",
                 plateNo:"",
                 NoOfSeat: 0,
                 
@@ -194,15 +200,22 @@ useEffect(()=>{
             setDriver('')
             setRedat('')
             setBState('')
-            setDriverRequired('')
-            setRedatRequired('')
+            // setDriverRequired('')
+            // setRedatRequired('')
               setOpen(true)
-            },3000)
+             }
+             catch(err) {
+              console.log(err)
+             }
+             finally {
+              setLoading(false)
+             }
+            
           }
          
     },
   });
-
+// console.log(users)
   return (
     <div style ={{
       width:isEdit?"500px":'600px',
@@ -222,16 +235,23 @@ useEffect(()=>{
            <RegistrationHeader description = {isEdit?'Edit Bus Information':'Register New Busses'} />
            </FormWrapper>
       <form onSubmit={formik.handleSubmit}>
-     <FormWrapper>
+      <FormWrapper>
             <TextField
-        
-        id="description"
-        name="description"
-        label="Description"
-        value={formik.values.description}
+        type="number"
+        id="serviceYear"
+        name="serviceYear"
+        label="Service Year"
+        value={formik.values.serviceYear}
         onChange={formik.handleChange}
-        error={formik.touched.description && Boolean(formik.errors.description)}
-        helperText={formik.touched.description && formik.errors.description}
+        InputProps = {{
+          startAdornment:(
+          <InputAdornment position="start">
+              <DescriptionIcon sx={{fontSize:"35px"}} color="primary"/>
+          </InputAdornment>
+          )
+      }}
+        error={formik.touched.sideNo && Boolean(formik.errors.sideNo)}
+        helperText={formik.touched.sideNo && formik.errors.sideNo}
       />
             </FormWrapper>
             <FormWrapper>
@@ -243,8 +263,34 @@ useEffect(()=>{
         
         value={formik.values.plateNo}
         onChange={formik.handleChange}
+        InputProps = {{
+          startAdornment:(
+          <InputAdornment position="start">
+              <AbcIcon sx={{fontSize:"35px"}} color="primary"/>
+          </InputAdornment>
+          )
+      }}
         error={formik.touched.plateNo && Boolean(formik.errors.plateNo)}
         helperText={formik.touched.plateNo && formik.errors.plateNo}
+      />
+            </FormWrapper>
+            <FormWrapper>
+            <TextField
+        
+        id="sideNo"
+        name="sideNo"
+        label="sideNo"
+        value={formik.values.sideNo}
+        onChange={formik.handleChange}
+        InputProps = {{
+          startAdornment:(
+          <InputAdornment position="start">
+              <DescriptionIcon sx={{fontSize:"35px"}} color="primary"/>
+          </InputAdornment>
+          )
+      }}
+        error={formik.touched.sideNo && Boolean(formik.errors.sideNo)}
+        helperText={formik.touched.sideNo && formik.errors.sideNo}
       />
             </FormWrapper>
             <FormWrapper>
@@ -257,6 +303,7 @@ useEffect(()=>{
           value={driver}
           label="driver"
           onChange={handleDriverChange}
+          startAdornment={<AirlineSeatReclineNormalIcon sx={{fontSize:"35px"}} color="primary"/>}
         >
           <MenuItem value="">
             <em>None</em>
@@ -270,7 +317,7 @@ useEffect(()=>{
           }
           <AddButton description = "Driver" handleClick = {handleDriverDialogOpen}/>
         </Select>
-        <FormHelperText sx={{color:'red'}}>{driverRequired}</FormHelperText>
+        {/* <FormHelperText sx={{color:'red'}}>{driverRequired}</FormHelperText> */}
         </FormControl>
           </FormWrapper>
           <FormWrapper>
@@ -283,6 +330,7 @@ useEffect(()=>{
           label="redat"
           value = {redat}
           onChange={handleRedatChange}
+          startAdornment={<EmojiPeopleIcon sx={{fontSize:"35px"}} color="primary"/>}
         >
           <MenuItem value="">
           <em>None</em>
@@ -294,7 +342,7 @@ useEffect(()=>{
           }
           <AddButton description = "Redat" handleClick = {handleRedatDialogOpen}/>
         </Select>
-        <FormHelperText sx={{color:'red'}}>{redatRequired}</FormHelperText>
+        {/* <FormHelperText sx={{color:'red'}}>{redatRequired}</FormHelperText> */}
         </FormControl>
           </FormWrapper>
             <FormWrapper>
@@ -305,6 +353,14 @@ useEffect(()=>{
         type='number'
         value={formik.values.NoOfSeat}
         onChange={formik.handleChange}
+        InputProps = {{
+          startAdornment:(
+          <InputAdornment position="start">
+              <NumbersIcon sx={{fontSize:"35px"}} color="primary"/>
+          </InputAdornment>
+          )
+      }}
+        
         error={formik.touched.NoOfSeat && Boolean(formik.errors.NoOfSeat)}
         helperText={formik.touched.NoOfSeat && formik.errors.NoOfSeat}
       />

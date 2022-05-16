@@ -9,6 +9,9 @@ import {BusRegistration} from './features/bus/busform'
 import {Schedule} from './features/schedule/scheduleform'
 import {BusList} from './features/bus/buslist'
 import {Booking} from './features/bookings/booking-form'
+import {Login} from './Components/login'
+import {OrganizationCode} from './Components/orgUnit'
+import {ScheduleItem} from './Components/scheduleItem'
 function App() {
   return (
    <ThemeProvider theme={theme}>
@@ -21,6 +24,10 @@ function App() {
         <Route path='/schedules' element = {<Schedule/>}/>
         <Route path='/buslist' element = {<BusList/>}/>
         <Route path='/booking' element = {<Booking/>}/>
+        <Route path='/login' element = {<Login/>}/>
+        <Route path='/orgCode' element = {<OrganizationCode/>}/>
+        <Route path='/test' element = {<ScheduleItem/>}/>
+        
       </Routes>
       </BrowserRouter>
    
