@@ -23,7 +23,7 @@ import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 type FormTypes = {firstName:string,lastName:string,phoneNumber:string,seatNumber?:number}
 const validate = (values:FormTypes) => {
     const errors:Partial<FormTypes> = {}
-
+    
     if (!values.firstName) {
       errors.firstName = 'Please Enter First Name of the Passenger'
     } 
@@ -39,20 +39,15 @@ const TextFieldForBooking = styled(TextField)({
     maxWidth:'200px',
     minWidth:'150px'
 })
-const initialFormValues = {
-  seatNumber:1,
-  firstName:'',
-  lastName:'',
-  phoneNumber:'',
-}
+
 export function Booking(){
 const timer = React.useRef<number>();
-const [formValues,setFormValues] = React.useState(initialFormValues)
+
 const [schedule,setSchedule] = React.useState('')
 const [depaturePlace,setDeparturePlace] = React.useState('')
 const [bookingDate,setBookingDate] = React.useState<Date|null>(new Date())
 const routeId = useAppSelector(state=>state.schedules.schedules.find(sch=>sch.id===schedule))?.Route
-const routeInfo = useAppSelector(state=>state.routes.find(r=>r.id===routeId)) as ROUTE 
+const routeInfo = useAppSelector(state=>state.routes.routes.find(r=>r.id===routeId)) as ROUTE 
 const scheduleInfo = useAppSelector(state=>state.schedules.schedules.find(sch=>sch.id===schedule))
 const handleScheduleChange = (e:SelectChangeEvent)=>{
     setSchedule(e.target.value)
@@ -63,13 +58,7 @@ const handleScheduleChange = (e:SelectChangeEvent)=>{
 const [loading, setLoading] = React.useState(false);
 const schedules = useAppSelector(state=>state.schedules.schedules)
 const departuerPlaces = scheduleInfo?.departurePlaces
-const handleFormValuesChange = (e:React.ChangeEvent<HTMLInputElement>) => {
-  const {name,value} = e.target
-  setFormValues({
-    ...formValues,
-    [name]:value
-  })
-}
+
 React.useEffect(()=>{
   document.title+=` - Book A Ticket`
   return ()=>{

@@ -13,7 +13,7 @@ class AuthService {
         if (response.data.token) {
           localStorage.setItem("user", JSON.stringify(response.data));
         }
-        console.log(response.data)
+        // console.log(response.data)
         return response.data;
       });
   }
@@ -25,7 +25,7 @@ class AuthService {
   }
 
   addRoute(newRoute){
-    return axios.post(`${API_URL}registerorganizationuser`,newRoute, { headers: authHeader() })
+    return axios.post(`${API_URL}addroute`,newRoute, { headers: authHeader() })
   }
 
 addBus(newBus){

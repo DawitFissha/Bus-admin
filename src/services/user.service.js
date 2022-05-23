@@ -19,6 +19,12 @@ class UserService {
   getBookedList() {
     return axios.get(API_URL + 'bookedList', { headers: authHeader() });
   }
+  getDrivers() {
+    return axios.get(API_URL + `getuserbyrole?role=driver`, { headers: authHeader() });
+  }
+  getRedats() {
+    return axios.get(API_URL + `getuserbyrole?role=redat`, { headers: authHeader() });
+  }
 }
 
 export default new UserService();

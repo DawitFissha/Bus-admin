@@ -9,6 +9,11 @@ export const theme = createTheme({
                     maxWidth:'600px'
                 }
             },
+            defaultProps:{
+                inputProps:{
+                min:0,
+                }
+            }
         },
         MuiButton:{
            styleOverrides:{

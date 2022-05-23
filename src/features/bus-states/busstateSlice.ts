@@ -6,19 +6,19 @@ export interface BUSSTATE {
 }
 const initialState:BUSSTATE[] = [
     {
-        id:'0',
+        id:'Active',
         description:'Active'
     },
     {
-        id:'1',
+        id:'On-Repair',
         description:'On Repair'
     },
     {
-        id:'2',
+        id:'Inactive',
         description:'Inactive'
     },
     {
-        id:'4',
+        id:'Damaged',
         description:'Damaged'
     }
 ]

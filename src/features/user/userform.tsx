@@ -1,5 +1,4 @@
 import React,{useState} from 'react';
-import { nanoid } from '@reduxjs/toolkit';
 import { useFormik } from 'formik';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
@@ -15,7 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormHelperText from '@mui/material/FormHelperText';
-import {ROLE} from '../../utils/Constants/roles'
+
 import {roles} from '../../utils/Constants/roles'
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
@@ -27,8 +26,10 @@ import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import PasswordIcon from '@mui/icons-material/Password';
 import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import {ValidatePhoneNumber} from '../../utils/regex-validators'
-import {addUsers,fetchUsers} from './userSlice'
+import {addUsers} from './userSlice'
 import Alert from '@mui/material/Alert'
+import { fetchDrivers,resetDriver} from './driverSlice';
+import { fetchRedats,resetRedat} from './redatSlice';
 type ERROR_TYPE = Partial<USER> & {confirmPassword?:string}
 // not a DRY code should be checked later
 interface VALUES_TYPE {
@@ -75,14 +76,14 @@ const validate = (values:VALUES_TYPE) => {
   };
 
 export const UserRegistration = ({providedRole,DialogClose}:{providedRole?:string,DialogClose?:()=>void}) => {
-const timer = React.useRef<number>();
+
 const [open,setOpen] = useState(false)
 const [gender,setGender] = useState('')
 const providedRoleDescription  = roles.find((role)=>role.id===providedRole)?.description 
 const [roleItem,setRoleItem] = useState(providedRole?providedRoleDescription:'')
 const roleId = roles.find((role)=>role.description===roleItem)?.id as string 
-const [genderError,setGenderError] = useState('')
- 
+const [genderErrorText,setGenderErrorText] = useState('')
+const [genderError,setGenderError] = useState(false)
 const [loading, setLoading] = React.useState(false);
 const [adduserError,setAddUserError] = useState('')
 const dispatch = useAppDispatch();
@@ -95,20 +96,15 @@ const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
 };
 const handleGenderChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
     setGender((e.target as HTMLInputElement).value)
+    setGenderErrorText('')
+    setGenderError(false)
 }
 const handleRoleChange = (e:SelectChangeEvent)=>{
   setRoleItem(e.target.value)
 }
 React.useEffect(()=>{
     document.title +=` - User Registration`
-    // if(userStatus==='idle'){
-    //   dispatch(fetchUsers())
-      
-    // }
-    // return ()=>{
-    //   clearTimeout(timer.current)
-    // }
-},[/*userStatus,dispatch*/])
+  },[])
 
   const formik = useFormik({
     initialValues: {
@@ -120,16 +116,18 @@ React.useEffect(()=>{
     },
     validate,
     onSubmit: async (values,{resetForm}) => {
-      // if(gender===''){
-      //   setGender('select Gender Please')
-      //   console.log(genderError)
-      // }
+     
         // else {
       
           if(!loading){
-            
-            setLoading(true)
-            // timer.current = window.setTimeout(()=>{
+
+            if(gender==='') {
+              setGenderError(true)
+              setGenderErrorText('Please Select Gender')
+            }
+            else {
+
+              setLoading(true)
               
             try {
               await dispatch(addUsers(
@@ -157,6 +155,17 @@ React.useEffect(()=>{
               setGender('')
               setRoleItem('')
               setOpen(true)
+            if(providedRole){
+
+              if(providedRole === 'driver'){
+                dispatch(resetDriver())
+                dispatch(fetchDrivers())
+              }
+              else if (providedRole === 'redat'){
+                dispatch(resetRedat())
+                dispatch(fetchRedats())
+              }
+            }
             if(DialogClose){
                 DialogClose()
               }
@@ -175,6 +184,8 @@ React.useEffect(()=>{
             finally {
               setLoading(false)
             }
+            }
+            
           }
          
         
@@ -243,6 +254,7 @@ React.useEffect(()=>{
         />
             </FormWrapper>
             <FormWrapper>
+            <FormControl variant="standard" error = {genderError}>
             <FormLabel id="gender-label">Gender</FormLabel>
             <RadioGroup
                 value ={gender}
@@ -253,9 +265,10 @@ React.useEffect(()=>{
       >
         <FormControlLabel value="male" control={<Radio />} label="Female" />
         <FormControlLabel value="female" control={<Radio />} label="Male" />
-        
-        
-      </RadioGroup>
+        </RadioGroup>
+        <FormHelperText >{genderErrorText}</FormHelperText>
+            </FormControl>
+            
             </FormWrapper>
         
             <FormWrapper>
@@ -291,15 +304,14 @@ React.useEffect(()=>{
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
-          {/* <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem> */
+          {
+          
           roles.map((role)=>(
             <MenuItem  key = {role.id} value={role.description}>{role.description}</MenuItem>
           ))
           }
         </Select>
-        <FormHelperText sx={{color:'red'}}>{genderError}</FormHelperText>
+        
         </FormControl>
             </FormWrapper>
         

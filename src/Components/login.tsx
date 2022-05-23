@@ -57,29 +57,28 @@ const handleClickShowPassword = ()=>{
             phoneNumber:"",
             password:"",
         },
-        onSubmit:(values)=>{
+        onSubmit:async (values)=>{
 
             if(!loginState.loading){
                 setLoginState({...loginState,loading:true})
-                AuthService.login(values.phoneNumber,loginState.organizationCode,values.password).then(
-                    ()=>{
-                        console.log('login successfull')
-                        setLoginState({...loginState,loading:false})
-                        // setCookie("user", `${token}`, {
-                        //     path: "/"
-                        //   });
-                        navigate('/')
-                    },
-                    (error:any)=>{
-                        const resMessage =
-                        (error.response &&
-                          error.response.data &&
-                          error.response.data.message) ||
-                        error.message ||
-                        error.toString();
-                        setLoginState({...loginState,loading:false,error:resMessage})
-                    }
-                )
+                try {
+                    await AuthService.login(values.phoneNumber,loginState.organizationCode,values.password)
+                    setLoginState({...loginState,loading:false})
+                    navigate('/')
+                }
+                catch(error:any) {
+                    const resMessage =
+                    (error.response &&
+                      error.response.data &&
+                      error.response.data.message) ||
+                    error.message ||
+                    error.toString();
+                    console.log(resMessage)
+                    
+                    setLoginState({...loginState,loading:false,error:resMessage})
+                    
+                }
+             
             }
         }
     })
