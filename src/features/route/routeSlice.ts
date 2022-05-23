@@ -1,9 +1,9 @@
-import {createSlice,PayloadAction,createAsyncThunk} from '@reduxjs/toolkit'
+import {createSlice,createAsyncThunk} from '@reduxjs/toolkit'
 import AuthService from "../../services/auth.service";
 export const addRoutes = createAsyncThunk('routes/addNewRoute',async (route: any) => {
     return await  ( await AuthService.addRoute(route)).data
-    
-  }
+    }
+
 )
 export interface ROUTE {
 id:string

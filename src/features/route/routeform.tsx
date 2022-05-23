@@ -4,7 +4,7 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import {ROUTE,addRoutes} from './routeSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
-import Box, { BoxProps } from '@mui/material/Box';
+import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -27,19 +27,7 @@ type VALUES_TYPE  = Required<Pick<ROUTE,'price'|'distance'|'estimatedHour'>>
 type ERROR_TYPE  = {
   [Property in keyof VALUES_TYPE]+?:string
 }
-const CustomeTextField = (props:any)=>{
-return(
-  <TextField 
-  inputProps={{
-    startAdornment:(
-      <InputAdornment position="start">
-          <PlaceIcon sx={{fontSize:"35px"}} color="primary"/>
-      </InputAdornment>
-      )
-  }}
-  />
-)
-}
+
 const validate = (values:VALUES_TYPE) => {
     const errors:ERROR_TYPE = {}
     if (!values.price) {
@@ -62,21 +50,26 @@ const validate = (values:VALUES_TYPE) => {
 export const RouteRegistration:React.FunctionComponent = () => {
 
 const [depPlace, setDepPlace] = React.useState<string[]>([]);
-const [assignedBus , setAssignedBus] = React.useState<string[]>([]);
+const [assignedBus, setAssignedBus] = React.useState<string[]>([]);
 const handleDepPlaceChange = (event: SelectChangeEvent<typeof depPlace>) => {
   const {
     target: { value },  
   } = event;
   setDepPlace(
-    // On autofill we get a stringified value.
     typeof value === 'string' ? value.split(',') : value,
   );
 };
+
 const handleAssignedBusChange = (event: SelectChangeEvent<typeof assignedBus>) => {
-  const {target: { value },} = event;
-  setAssignedBus(typeof value === 'string' ? value.split(',') : value);
+  const {
+    target: { value },
+  } = event;
+  setAssignedBus(
+    
+    typeof value === 'string' ? value.split(',') : value,
+  );
 };
-const timer = React.useRef<number>();
+
 const [open,setOpen] = useState(false)
 const [samecity,setSameCity] = useState(false)
 const [loading, setLoading] = React.useState(false);
@@ -87,7 +80,12 @@ const cityNames =  cities.map((city)=>city['name'])
  const [source, setSource] = React.useState<string>(cityNames[0]);
  const depPlaces = useAppSelector(state=>state.cities.find((city)=>(city.name===source)))?.departurePlaces
  const allBusses = useAppSelector(state=>state.busses.busses)
- const ActiveBussesId = allBusses/*.filter(bus=>bus.busState==="Active") */.map(ab=>ab._id) as string[]
+ const ActiveBusses = allBusses.filter(bus=>bus.busState==="Active") .map((ab:any)=>(
+   {
+     _id:ab._id,
+     busPlateNo:ab.busPlateNo
+   }
+ )) 
  const [destination, setDestination] = React.useState<string>(cityNames[0]);
  const busStatus = useAppSelector(state=>state.busses.status)
 
@@ -117,9 +115,7 @@ React.useEffect(()=>{
     if(busStatus==='idle'){
       dispatch(fetchBusses())
     }
-    return ()=>{
-      clearTimeout(timer.current)
-    }
+   
     
 },[busStatus,dispatch])
   const formik = useFormik({
@@ -136,6 +132,7 @@ React.useEffect(()=>{
          else {
           if(!loading){
             setLoading(true)
+
             try {
               await dispatch(addRoutes({
                 source,
@@ -146,7 +143,7 @@ React.useEffect(()=>{
                 distance:values.distance>0?values.distance:null,
                 estimatedhour:values.estimatedHour>0?values.estimatedHour:null,
                 bus:assignedBus,
-              }))
+              })).unwrap()
               
               resetForm({values:{
                 price: 0,
@@ -170,9 +167,9 @@ React.useEffect(()=>{
          }
     },
   });
-// console.log(allBusses.find(bus=>bus._id===ActiveBussesId[0]).busPlateNo)
+
 console.log(busStatus)
-console.log(depPlace)
+// console.log(depPlace)
   return (
      busStatus==='loading'? 
       <Box sx={{ display: 'flex' }}>
@@ -273,24 +270,7 @@ console.log(depPlace)
       />
             </FormWrapper>
             <FormWrapper>
-            {/* <TextField
-        
-        id="assignedBus"
-        name="assignedBus"
-        label="Number of Busses"
-        type='number'
-        value={formik.values.assignedBus}
-        onChange={formik.handleChange}
-        InputProps = {{
-          startAdornment:(
-          <InputAdornment position="start">
-              <NumbersIcon sx={{fontSize:"35px"}} color="primary"/>
-          </InputAdornment>
-          )
-      }}
-        error={formik.touched.assignedBus && Boolean(formik.errors.assignedBus)}
-        helperText={formik.touched.assignedBus && formik.errors.assignedBus}
-      /> */}
+            
             <FormControl sx={{width: 460 }}>
         <InputLabel id="assign-bus">Assign Bus</InputLabel>
         <Select
@@ -300,7 +280,11 @@ console.log(depPlace)
           value={assignedBus}
           onChange={handleAssignedBusChange}
           input={<OutlinedInput id="assignBus-multiple-chip" label="Assign Bus" />}
-          renderValue={(selected)=>selected.join(',')}
+          renderValue={(selected)=>{
+            return selected.map(sel=>(
+              ActiveBusses?.find(ab=>ab._id===sel)?.busPlateNo
+            )).join(',')
+          }}
           MenuProps={MenuProps}
           startAdornment = {
           <InputAdornment position="start">
@@ -311,15 +295,15 @@ console.log(depPlace)
           }
         >
           {
-          ActiveBussesId?
-          ActiveBussesId.map((activeBus) => (
+          ActiveBusses?
+          ActiveBusses.map((activeBus) => (
             <MenuItem
-              key={activeBus}
-              value = {activeBus}
-              // value={allBusses.find(bus=>bus._id===activeBus).busPlateNo}
-            >
-              <Checkbox checked={assignedBus.indexOf(activeBus) > -1} />
-              <ListItemText primary={allBusses.find(bus=>bus._id===activeBus).busPlateNo} />
+              key={activeBus._id}
+              value = {activeBus._id}
+              >
+                
+              <Checkbox checked={assignedBus.indexOf(activeBus._id) > -1} />
+              <ListItemText primary={activeBus.busPlateNo} />
             </MenuItem>
           )):null
           }

@@ -6,10 +6,10 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import {InputProps} from '@mui/material/Input'
+
 import {addSchedule} from './scheduleSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
-import Box, { BoxProps } from '@mui/material/Box';
+import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -47,9 +47,9 @@ const dispatch = useAppDispatch()
 const timer = React.useRef<number>();
 const [open,setOpen] = useState(false)
 const [loading, setLoading] = React.useState(false);
-const routes = useAppSelector(state=>state.routes)
+const routes = useAppSelector(state=>state.routes.routes)
 const [route,setRoute] = useState('')
-const routeId = routes.find((r)=>r.source===route)?.id as string // routes with same source city may happen so need to be checked later
+const routeId = routes.find((r)=>r.source===route)?._id as string // routes with same source city may happen so need to be checked later
 const price = routes.find((r)=>r.source===route)?.price
 const departurePlaces = routes.find((r)=>r.source===route)?.departurePlace
 const [depPlace, setDepPlace] = React.useState<string[]>([]);
@@ -272,7 +272,7 @@ const formik = useFormik({
         >
           {
           departurePlaces?
-          departurePlaces!.map((departurePlace,index) => (
+          departurePlaces!.map((departurePlace:string,index:number) => (
             <MenuItem
               key={index}
               value={departurePlace}

@@ -1,9 +1,11 @@
 import UserService from '../../services/user.service'
 import AuthService from "../../services/auth.service";
-import {createSlice,PayloadAction,createAsyncThunk} from '@reduxjs/toolkit'
+import {createSlice,createAsyncThunk} from '@reduxjs/toolkit'
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers',async ()=>{
-    return await (await UserService.getUserList()).data
+
+return await (await UserService.getUserList()).data
+
 })
 
 export const addUsers = createAsyncThunk('users/addNewuser',async (user: any) => {
@@ -38,9 +40,7 @@ const usersSlice = createSlice({
     name:'users',
     initialState,
     reducers:{
-        // addUser:(state,action:PayloadAction<USER>)=>{
-        //     state.users.push(action.payload)
-        // }
+       
     },
     extraReducers(builder) {
         builder

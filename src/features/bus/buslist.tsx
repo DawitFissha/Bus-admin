@@ -16,6 +16,8 @@ import Tooltip from '@mui/material/Tooltip';
 import { Dialog, DialogContent } from '@mui/material';
 import { BusRegistration } from './busform';
 import {fetchBusses} from './busSlice'
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 export function BusList(){
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -39,7 +41,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   }));
 const busses = useAppSelector(state=>state.busses.busses)
 const busStatus = useAppSelector(state=>state.busses.status)
-const users = useAppSelector(state=>state.users.users)
+const drivers = useAppSelector(state=>state.drivers.drivers)
+const redats = useAppSelector(state=>state.redats.redats)
 const BusState = useAppSelector(state=>state.busStates)
 const dispatch = useAppDispatch();
 const [busId,setBusId] = React.useState<string|null>(null)
@@ -62,12 +65,20 @@ const handleBusDelete = (id:string)=>{
     }
     
   },[busStatus,dispatch])
-  console.log(busses)
+  console.log(drivers)
+  console.log(drivers.find(driver=>driver._id === '62839d11e8b2c30023a67189')?.firstName)
 return (
   <>
       <h2>List of Busses</h2>
-      <div>
+      {
+        busStatus === 'loading'?
+        <Box>
+          <CircularProgress/>
+        </Box>
+        :<div>
+
         {
+          
           busses.length>0?(
             <TableContainer sx={{maxWidth:1000}} component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -84,17 +95,17 @@ return (
         </TableHead>
         <TableBody>
           {busses.map((bus:any) => (
-           bus._id!=='dummy0Bus'&&(
+           
             <StyledTableRow
             key={bus._id}
             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
           >
             <StyledTableCell component="th" scope="row">
-              {bus.busSideNo}
+              {bus.driverId}
             </StyledTableCell>
             <StyledTableCell align="right">{bus.busPlateNo}</StyledTableCell>
-            <StyledTableCell align="right">{`${users.find((user)=>user.id===bus.driverId)?.firstName} ${users.find((user)=>user.id===bus.driverId)?.lastName}`}</StyledTableCell>
-            <StyledTableCell align="right">{`${users.find((user)=>user.id===bus.redatId)?.firstName} ${users.find((user)=>user.id===bus.redatId)?.lastName}`}</StyledTableCell>
+            <StyledTableCell align="right">{`${drivers.find((driver)=>driver._id===bus.driverId)?.firstName} ${drivers.find((driver)=>driver._id===bus.driverId)?.lastName}`}</StyledTableCell>
+            <StyledTableCell align="right">{`${redats.find((redat)=>redat._id===bus.redatId)?.firstName} ${redats.find((redat)=>redat._id===bus.redatId)?.lastName}`}</StyledTableCell>
             <StyledTableCell align="right">{bus.totalNoOfSit}</StyledTableCell>
             <StyledTableCell align="right">{bus.busState}</StyledTableCell>
              <StyledTableCell> 
@@ -114,7 +125,7 @@ return (
 
                  </StyledTableCell>     
           </StyledTableRow>
-           )
+           
           ))}
         </TableBody>
       </Table>
@@ -122,6 +133,8 @@ return (
           ):<h3>No registered busses yet</h3>
         }
       </div>
+
+      }
     <Dialog open = {opendDialog} onClose = {DialogClose}>
               <DialogContent>
               <BusRegistration
