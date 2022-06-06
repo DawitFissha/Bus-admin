@@ -24,7 +24,7 @@ const validate = (values:{OrganizationCode:string})=>{
     return errors
 }
 export const OrganizationCode = ()=>{
-const [loading,setLoading] = React.useState(false);
+
 const navigate = useNavigate()
 const formik = useFormik({
     validate,
@@ -32,10 +32,9 @@ const formik = useFormik({
         OrganizationCode:""
     },
     onSubmit:(values,{resetForm})=>{
-        if(!loading){
-            setLoading(true)
-            setTimeout(() => {
-                setLoading(false)
+        
+            
+    
                 localStorage.setItem("orgCode", values.OrganizationCode);
                 console.log(localStorage.getItem('orgCode'))
                 resetForm({
@@ -44,8 +43,8 @@ const formik = useFormik({
                     }
                 })
                 navigate('/login')
-            }, 3000);
-        }
+            
+        
     },
 })
 React.useEffect(() => {
@@ -102,7 +101,6 @@ React.useEffect(() => {
                 <FormWrapper>
                         <LoadingButton  
                                 type="submit"
-                                loading={loading}
                                 sx={{marginLeft:"32%",borderRadius:'14px',width:150}} color="primary" variant="outlined" 
                                 startIcon={<DoubleArrowIcon/>}
                                 >

@@ -15,9 +15,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import Tooltip from '@mui/material/Tooltip';
 import { Dialog, DialogContent } from '@mui/material';
 import { BusRegistration } from './busform';
-import {fetchBusses} from './busSlice'
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { allBusses } from '../../App';
 export function BusList(){
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -39,7 +39,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
       border: 0,
     },
   }));
-const busses = useAppSelector(state=>state.busses.busses)
+
 const busStatus = useAppSelector(state=>state.busses.status)
 const drivers = useAppSelector(state=>state.drivers.drivers)
 const redats = useAppSelector(state=>state.redats.redats)
@@ -59,12 +59,6 @@ const handleBusDelete = (id:string)=>{
     setBusId(id)
   }
   const oldBusData = useAppSelector(state=>state.busses.busses.find(bus=>bus._id===busId))
-  React.useEffect(()=>{
-    if(busStatus==='idle'){
-      dispatch(fetchBusses())
-    }
-    
-  },[busStatus,dispatch])
   console.log(drivers)
   console.log(drivers.find(driver=>driver._id === '62839d11e8b2c30023a67189')?.firstName)
 return (
@@ -79,7 +73,7 @@ return (
 
         {
           
-          busses.length>0?(
+          allBusses.length>0?(
             <TableContainer sx={{maxWidth:1000}} component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -94,7 +88,7 @@ return (
           </TableRow>
         </TableHead>
         <TableBody>
-          {busses.map((bus:any) => (
+          {allBusses.map((bus:any) => (
            
             <StyledTableRow
             key={bus._id}

@@ -25,6 +25,12 @@ class UserService {
   getRedats() {
     return axios.get(API_URL + `getuserbyrole?role=redat`, { headers: authHeader() });
   }
+  getRoutes() {
+    return axios.get(API_URL + `getorganizationroute`, { headers: authHeader() });
+  }
+  getSchedules() {
+    return axios.get(API_URL + `getallschedule`, { headers: authHeader() });
+  }
 }
 
 export default new UserService();

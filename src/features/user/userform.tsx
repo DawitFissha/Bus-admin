@@ -14,7 +14,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormHelperText from '@mui/material/FormHelperText';
-
 import {roles} from '../../utils/Constants/roles'
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
@@ -194,9 +193,9 @@ React.useEffect(()=>{
 
   return (
     <div style ={{
-      width:providedRole?'500px':"600px",
+      width:providedRole?'100%':"600px",
       marginTop:'2px',
-      marginLeft:providedRole?'5px':'25%',
+      marginLeft:providedRole?'0':'25%',
       height:'auto',
      background:'#FFFF',
      marginBottom:'5px',
@@ -208,7 +207,7 @@ React.useEffect(()=>{
             marginLeft:providedRole?'0%':'10%'
        }}>
            <FormWrapper>
-           <RegistrationHeader description = 'Register Users' />
+           {providedRole?null:<RegistrationHeader description = 'Register Users' />}
            </FormWrapper>
       <form onSubmit={formik.handleSubmit}>
    
