@@ -1,5 +1,10 @@
 import {createSlice,createAsyncThunk} from '@reduxjs/toolkit'
+import UserService from '../../services/user.service'
 import AuthService from "../../services/auth.service";
+export const fetchRoutes = createAsyncThunk('routes/fetchRoutes',async ()=>{
+    return await (await UserService.getRoutes()).data
+    })
+
 export const addRoutes = createAsyncThunk('routes/addNewRoute',async (route: any) => {
     return await  ( await AuthService.addRoute(route)).data
     }
@@ -37,6 +42,17 @@ const routesSlice = createSlice({
         .addCase(addRoutes.fulfilled,(state,action)=>{
             state.routes.push(action.payload)
         })
+        .addCase(fetchRoutes.pending, (state) => {
+            state.status = 'loading'
+          })
+          .addCase(fetchRoutes.fulfilled, (state, action) => {
+            state.status = 'succeeded'
+            state.routes = state.routes.concat(action.payload)
+          })
+          .addCase(fetchRoutes.rejected, (state, action) => {
+            state.status = 'failed'
+            state.error = action.error.message
+          })
     }
 })
 

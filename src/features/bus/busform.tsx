@@ -26,15 +26,11 @@ import NumbersIcon from '@mui/icons-material/Numbers';
 import {fetchDrivers} from '../user/driverSlice'
 import {fetchRedats} from '../user/redatSlice'
 import CircularProgress from '@mui/material/CircularProgress';
+import DialogRenderer from '../../Components/dialog/dialogRenderer'
 const RoleData = {
     DRIVER:'driver',
     REDAT:'redat',
 }
-
-// type VALUES_TYPE  = Pick<BUS,'sideNo'|'plateNo'|'NoOfSeat'>
-// type ERROR_TYPE  = {
-//   [Property in keyof VALUES_TYPE]+?:string
-// }
 
 const validate = (values:any) => {
     const errors:any = {}
@@ -410,12 +406,12 @@ useEffect(()=>{
       </Button>
           </FormWrapper>
           <SaveSuccessfull open={open} handleClose={handleClose} message = {isEdit? 'Bus Information Updated Successfully':'Bus Successfully Registered'} />
-          <Dialog open = {opendDialog} onClose = {DialogClose}>
-            <DialogContent>
+          <DialogRenderer open = {opendDialog} handleClose = {DialogClose} title="Register Users">
+            
               {driverButton&&<UserRegistration providedRole = {RoleData.DRIVER} DialogClose = {DialogClose} />}
               {redatButton&&<UserRegistration providedRole = {RoleData.REDAT} DialogClose = {DialogClose} />}
-            </DialogContent>
-          </Dialog>
+            
+          </DialogRenderer>
           
     </form>
     

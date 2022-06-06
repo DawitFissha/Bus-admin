@@ -27,7 +27,9 @@ class AuthService {
   addRoute(newRoute){
     return axios.post(`${API_URL}addroute`,newRoute, { headers: authHeader() })
   }
-
+  addSchedule(newSchedule){
+    return axios.post(`${API_URL}addschedule`,newSchedule, { headers: authHeader() })
+  }
 addBus(newBus){
     return axios.post(`${API_URL}registerbus`,newBus, { headers: authHeader() })
   }
@@ -45,13 +47,7 @@ addBus(newBus){
       sits
     }, { headers: authHeader() });
   }
-  addBusInfo(busplateno, bussideno, driversuername, isactive, totalsit) {
-
-    return axios.post(API_URL + 'registerbus', {
-      busplateno,
-      bussideno, driversuername, isactive, totalsit,
-    }, { headers: authHeader() }).then(response => { console.log(response.data) });
-  }
+ 
   updateBusInfo(busplateno, bussideno, driversuername, isactive, totalsit, id) {
 
     return axios.put(API_URL + `updateorganizationbus/${id}`, {

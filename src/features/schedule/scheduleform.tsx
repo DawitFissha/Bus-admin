@@ -1,12 +1,11 @@
 import React,{useState,useEffect} from 'react';
-import {nanoid} from '@reduxjs/toolkit'
 import {format} from 'date-fns'
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-
+import {fetchRoutes} from '../route/routeSlice'
 import {addSchedule} from './scheduleSlice'
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
 import Box from '@mui/material/Box';
@@ -17,7 +16,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {RegistrationHeader} from '../../Components/registrationHeader'
 import {SavingProgress} from '../../Components/savingProgress'
 import {SaveSuccessfull} from '../../Components/saveSuccess'
-import { Checkbox, FormHelperText, InputAdornment, ListItemText, OutlinedInput } from '@mui/material';
+import {FormHelperText, InputAdornment, ListItemText, OutlinedInput } from '@mui/material';
 import { TimePicker } from '@mui/lab';
 import { useFormik } from 'formik';
 import {FormWrapper} from '../../Components/formWrapper'
@@ -25,6 +24,10 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import RouteIcon from '@mui/icons-material/Route';
 import DepartureBoardIcon from '@mui/icons-material/DepartureBoard';
 import SvgIcon from '@mui/material/SvgIcon';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import Autocomplete from '@mui/material/Autocomplete';
+import CircularProgress from '@mui/material/CircularProgress';
+import {ActiveBusses} from '../../App'
 const validate = (values:{description:string}) => {
     const errors:{description?:string} = {}
     if (!values.description) {
@@ -44,32 +47,42 @@ export const Schedule:React.FunctionComponent = () => {
       },
     };
 const dispatch = useAppDispatch()
-const timer = React.useRef<number>();
+const routeStatus = useAppSelector(state=>state.routes.status)
 const [open,setOpen] = useState(false)
+const [routesOpen,setRoutesOpen] = useState(false)  
+const routesLoading = routesOpen && routeStatus==='idle'
 const [loading, setLoading] = React.useState(false);
 const routes = useAppSelector(state=>state.routes.routes)
-const [route,setRoute] = useState('')
-const routeId = routes.find((r)=>r.source===route)?._id as string // routes with same source city may happen so need to be checked later
-const price = routes.find((r)=>r.source===route)?.price
-const departurePlaces = routes.find((r)=>r.source===route)?.departurePlace
-const [depPlace, setDepPlace] = React.useState<string[]>([]);
+const routeOptions = routes.map(route=>(
+  {label:route._id,source:route.source,destination:route.destination}
+))
+
+const [route,setRoute] = useState({
+  label:'',source:'',destination:''
+})
+const [routeValue,setRouteValue] = useState('')
+const routeId = route.label
+const tarif = routes.find((r)=>r._id===routeId)?.tarif
+const departurePlaces = routes.find((r)=>r._id===routeId)?.departurePlace
+const assignedBusses = routes.find((r)=>r._id===routeId)?.bus
+const source = routes.find((r)=>r._id===routeId)?.source
+const destination = routes.find((r)=>r._id===routeId)?.destination
+const estimatedhour = routes.find((r)=>r._id===routeId)?.estimatedHour
+const distance = routes.find((r)=>r._id===routeId)?.distance
+const [depPlace, setDepPlace] = React.useState('');
+const [assignedBus, setAssignedBus] = React.useState('');
 const [departureDate,setDepartureDate] = useState<Date|null>(null)
 const [departureTime,setDepartureTime] = useState<Date|null>(null)
-const canSave = Boolean(routeId)&&Boolean(departureDate)&&Boolean(departureTime)
+const canSave = Boolean(route)&&Boolean(departureDate)&&Boolean(departureTime)&&Boolean(depPlace)
 // better if its handled using refs ...
 const [required,setRequired] = useState('')
-const handleDepPlaceChange = (event: SelectChangeEvent<typeof depPlace>) => {
-  const {
-    target: { value },
-  } = event;
-  setDepPlace(
-    // On autofill we get a stringified value.
-    typeof value === 'string' ? value.split(',') : value,
-  );
+const handleDepPlaceChange = (e: SelectChangeEvent) => {
+setDepPlace(e.target.value);
 };
-const handleRouteChagne = (e:SelectChangeEvent)=>{
-    setRoute(e.target.value)
-}
+
+const handleAssignedBusChange = (event:SelectChangeEvent) => {
+ setAssignedBus(event.target.value);
+};
 
 const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
   if (reason === 'clickaway') {
@@ -80,18 +93,17 @@ const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
 
 useEffect(()=>{
     document.title+=` - Create Schedule`
-    return ()=>{
-      clearTimeout(timer.current)
+    if(routesLoading){
+      dispatch(fetchRoutes())
     }
-    
-},[])
+    },[routesLoading,dispatch])
 
 const formik = useFormik({
     initialValues: {
       description: "",
     },
     validate,
-    onSubmit: (values,{resetForm}) => {
+    onSubmit: async (values,{resetForm}) => {
        if(!canSave){
         setRequired('required')
         return
@@ -99,33 +111,48 @@ const formik = useFormik({
        }
         if(!loading){
             setLoading(true)
-            timer.current = window.setTimeout(()=>{
-              
-              dispatch(addSchedule({
-                id:nanoid(),
+            try {
+              await dispatch(addSchedule(
+                {
+                source,
                 description:values.description,
-                creationDate:format(new Date(),'MM/dd/yyyy'),
-                departureDate,
-                departureTime,
-                Route:routeId,
-                departurePlaces:depPlace?depPlace:undefined,
-                busId:'dummy0Bus',
-              }))
-              setLoading(false)
+                destination,
+                tarif,
+               distance,
+               estimatedhour,
+               assignedbus:assignedBus,
+               depplace:depPlace,
+               depdateandtime:new Date(`${departureDate?.toLocaleDateString()} ${departureTime?.toTimeString()}`).toISOString(),
+               totalnoofsit:ActiveBusses?.find(ab=>ab._id===assignedBus)?.totalNoOfSit,
+               
+             }
+              )).unwrap()
+              
               resetForm({values:{
                 description: ""
               }})
               setDepartureDate(null)
               setDepartureTime(null)
-              setDepPlace([])
-              setRoute('')
+              setDepPlace('')
+              setAssignedBus('')
+              setRoute({
+                label:'',source:'',destination:''
+              })
               setOpen(true)
               setRequired('')
-            },3000)
-          }
+            }
+            catch(err){
+              console.log(err)
+            }
+            finally{
+              setLoading(false)
+            }
+              }
        
     },
   });
+  
+  console.log(route.label)
   
   return (
    <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -154,7 +181,7 @@ const formik = useFormik({
                size = 'small'
                value={format(new Date(),'MM/dd/yyyy')}
                />
-               <h4 style = {{marginTop:'10px'}}>Price - {price?`${price} Birr`:''}</h4>
+               <h4 style = {{marginTop:'10px'}}>Price - {tarif?`${tarif} Birr`:''}</h4>
            </Box>
       <form onSubmit={formik.handleSubmit}>
       <FormWrapper>
@@ -176,34 +203,54 @@ const formik = useFormik({
       />
             </FormWrapper>
             <FormWrapper>
-            <FormControl sx={{minWidth: 460 }}>
-            <InputLabel id="route-select-label">Route</InputLabel>
-        <Select
-          labelId="route-select-label"
-          id="route-select-helper"
-          name="route"
-          value={route}
-          label="route"
-          onChange={handleRouteChagne}
-          startAdornment = {
-            <InputAdornment position="start">
-            <RouteIcon color="primary" sx={{fontSize:"35px"}}/>
-            </InputAdornment>
-          }
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-       {
-          routes.map((route)=>(
-            <MenuItem  key = {route.id} value={route.source}>
-                <ListItemText primary = {`${route.source} to ${route.destination}`}/>
-            </MenuItem>
-          ))
-          }
-        </Select>
-        
-        </FormControl>
+        <Autocomplete
+        value={route}
+        onChange={(event: any, newValue: any) => {
+          setRoute(newValue);
+        }}
+        id="routes"
+        open={routesOpen}
+        onOpen = {()=>{
+          setRoutesOpen(true)
+        }}
+        onClose = {()=>{
+          setRoutesOpen(false)
+        }}
+        loading = {routesLoading}
+        inputValue={routeValue}
+        onInputChange={(event, newInputValue) => {
+          setRouteValue(newInputValue);
+        }}
+        options={routeOptions}
+        getOptionLabel={(option) => (Boolean(route.source)&&Boolean(route.destination)?`${option.source} to ${option.destination}`:'')}
+        // isOptionEqualToValue={(option, value) => option.label === value.label}
+        renderOption = {(props,option)=>(
+          <Box component={`li`} {...props}>
+            {`${option.source} to ${option.destination}`}
+          </Box>
+        )}
+        sx={{ width: 300 }}
+        renderInput={(params) => (
+          <TextField
+          {...params}
+          label="Routes"
+          InputProps={{
+            ...params.InputProps,
+            startAdornment:(
+              <InputAdornment position="start">
+              <RouteIcon sx={{fontSize:"35px"}} color="primary"/>
+          </InputAdornment>
+            ),
+            endAdornment: (
+              <React.Fragment>
+                {routeStatus==='loading' ? <CircularProgress color="inherit" size={20} /> : null}
+                {params.InputProps.endAdornment}
+              </React.Fragment>
+            ),
+          }}
+        />
+        )}
+      />
         </FormWrapper>
         <FormWrapper>
             <DatePicker
@@ -256,11 +303,11 @@ const formik = useFormik({
         <Select
           labelId="departure-place"
           id="departure-places"
-          multiple
+          // multiple
           value={depPlace}
           onChange={handleDepPlaceChange}
           input={<OutlinedInput id="select-multiple" label="Departure Place" />}
-          renderValue={(selected)=>selected.join(', ')}
+          // renderValue={(selected)=>routes?.find(route=>route._id===selected)?.busPlateNo}
           MenuProps={MenuProps}
           startAdornment = {
             <InputAdornment position="start">
@@ -277,7 +324,7 @@ const formik = useFormik({
               key={index}
               value={departurePlace}
             >
-              <Checkbox checked={depPlace.indexOf(departurePlace) > -1} />
+         
               <ListItemText primary={departurePlace} />
             </MenuItem>
           )):null
@@ -286,6 +333,39 @@ const formik = useFormik({
       </FormControl>
           </FormWrapper>
 
+          <FormWrapper>
+          <FormControl sx={{width: 460 }}>
+        <InputLabel id="departure-place">Bus</InputLabel>
+        <Select
+          labelId="departure-place"
+          id="departure-places"
+          // multiple
+          value={assignedBus}
+          onChange={handleAssignedBusChange}
+          input={<OutlinedInput id="select-multiple" label="Departure Place" />}
+          renderValue={(selected)=>ActiveBusses?.find(ab=>ab._id===selected)?.busPlateNo}
+          MenuProps={MenuProps}
+          startAdornment = {
+            <InputAdornment position="start">
+              <DirectionsBusIcon color="primary" fontSize='large'/>
+            </InputAdornment>
+            }
+        >
+          {
+          assignedBusses?
+          assignedBusses!.map((assignedBus:string) => (
+            <MenuItem
+              key={assignedBus}
+              value={assignedBus}
+            >
+              
+              <ListItemText primary={ActiveBusses.find(activeBus=>(activeBus._id === assignedBus)).busPlateNo} />
+            </MenuItem>
+          )):null
+          }
+        </Select>
+      </FormControl>
+          </FormWrapper>
             <FormWrapper>
             <Button  
             type="submit"

@@ -18,11 +18,13 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-redux": "^7.1.7",
     "axios": "^0.26.1",
+    "concat-map": "^0.0.1",
     "date-fns": "^2.28.0",
     "formik": "^2.2.9",
     "react": "^17.0.2",
     "react-cookie": "^4.1.1",
     "react-dom": "^17.0.2",
+    "react-draggable": "^4.4.5",
     "react-redux": "^7.2.0",
     "react-router-dom": "6",
     "react-scripts": "5.0.0",
@@ -48,5 +50,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "typescript-plugin-css-modules": "^3.4.0"
   }
 }

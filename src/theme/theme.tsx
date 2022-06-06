@@ -35,6 +35,14 @@ export const theme = createTheme({
             
            }
         },
+        MuiDialogContent:{
+            styleOverrides:{
+                root:{
+                    padding:0,
+                    margin:0,
+                }
+            }
+        },
         MuiButtonBase:{
             defaultProps:{
                 disableRipple:true,

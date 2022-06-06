@@ -15,7 +15,7 @@ import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import Avatar from '@mui/material/Avatar'
 import AuthService from "../services/auth.service";
 import Alert from '@mui/material/Alert'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate,useLocation} from 'react-router-dom'
 import {ValidatePhoneNumber} from '../utils/regex-validators'
 // import {useCookies} from 'react-cookie'
 interface LOGIN_VALUES {
@@ -42,6 +42,8 @@ const validate = (values:LOGIN_VALUES)=>{
 export const Login = ()=>{
 // const [cookies,setCookie]= useCookies(["user"])
 const navigate = useNavigate()
+let location = useLocation() as any;
+let from = location.state?.from?.pathname || "/home";
 const [loginState,setLoginState] = React.useState({
   organizationCode: localStorage.getItem('orgCode')? localStorage.getItem('orgCode')?.replace(/"/g, '') : "",
   loading:false,
@@ -64,7 +66,7 @@ const handleClickShowPassword = ()=>{
                 try {
                     await AuthService.login(values.phoneNumber,loginState.organizationCode,values.password)
                     setLoginState({...loginState,loading:false})
-                    navigate('/')
+                    navigate(from, { replace: true });
                 }
                 catch(error:any) {
                     const resMessage =
