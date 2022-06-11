@@ -11,14 +11,13 @@ children: React.ReactNode
 }
 export default function DialogRenderer(props:DialogProps) {
 const {open,handleClose,title,children} = props
-//seems like a good idea to make the code DRY will be implemented later
 
     return(
-        <Dialog PaperComponent = {PaperComponent} open = {open} onClose = {handleClose}  aria-labelledby="draggable-dialog-title">
+        <Dialog  PaperComponent = {PaperComponent} open = {open} onClose = {handleClose}  aria-labelledby="draggable-dialog-title">
                 <BootstrapDialogTitle id="draggable-dialog-title" onClose={handleClose}>
                 {title}
         </BootstrapDialogTitle>
-              <DialogContent sx = {{backgroundColor:'#F2BDF4'}} dividers>
+              <DialogContent sx = {{backgroundColor:'#706C6C'}} dividers>
                   {children}
               </DialogContent>
             </Dialog>
