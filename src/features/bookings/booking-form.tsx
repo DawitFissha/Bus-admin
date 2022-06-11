@@ -5,7 +5,7 @@ import Divider from '@mui/material/Divider';
 import Select,{SelectChangeEvent} from '@mui/material/Select';
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
 import {AutomaticSeatPicker} from '../../utils/automaticSeatPicker'
-import {NoOfSeatArray} from '../../utils/noOfSeatArray'
+import {getSeatList} from '../../utils/getSeatList'
 import { styled } from '@mui/system';
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
@@ -67,13 +67,13 @@ const handleScheduleChange = (e:SelectChangeEvent)=>{
 const [loading, setLoading] = React.useState(false);
 const schedules = useAppSelector(state=>state.schedules.schedules)
 const scheduleStatus = useAppSelector(state=>state.schedules.status)
-console.log(schedule ? Math.min(...AutomaticSeatPicker(NoOfSeatArray(scheduleInfo?.totalNoOfSit),scheduleInfo?.occupiedSitNo)) : 1)
+console.log(schedule ? AutomaticSeatPicker(getSeatList(scheduleInfo?.totalNoOfSit),scheduleInfo?.occupiedSitNo) : 1)
 React.useEffect(()=>{
   document.title+=` - Book A Ticket`
   if(scheduleStatus==='idle'){
     dispatch(fetchSchedules())
   }
-  setSeatNumber(Math.min(...AutomaticSeatPicker(NoOfSeatArray(scheduleInfo?.totalNoOfSit),scheduleInfo?.occupiedSitNo)))
+  setSeatNumber(AutomaticSeatPicker(getSeatList(scheduleInfo?.totalNoOfSit),scheduleInfo?.occupiedSitNo))
 
 },[scheduleInfo,scheduleStatus,dispatch])
 const formik = useFormik({
@@ -84,11 +84,7 @@ const formik = useFormik({
   },
   validate,
   onSubmit: (values,{resetForm}) => {
-    //  if(!canSave){
-    //   setRequired('required')
-    //   return
-
-    //  }
+  
       if(!loading){
           setLoading(true)
           timer.current = window.setTimeout(()=>{
