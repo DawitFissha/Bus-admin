@@ -71,7 +71,7 @@ const handleAssignedBusChange = (event: SelectChangeEvent<typeof assignedBus>) =
   );
 };
 
-const [open,setOpen] = useState(false)
+const [saveStatus,setSaveStatus] = useState(false)
 const [samecity,setSameCity] = useState(false)
 const [loading, setLoading] = React.useState(false);
 const cities = useAppSelector(state=>state.cities)
@@ -97,11 +97,11 @@ const handleSameCityClose = () => {
   setSameCity(false);
 };
 const dispatch = useAppDispatch();
-const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+const handleSaveStatusClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
   if (reason === 'clickaway') {
     return;
   }
-  setOpen(false);
+  setSaveStatus(false);
 };
 
 React.useEffect(()=>{
@@ -142,7 +142,7 @@ React.useEffect(()=>{
               setSource('')
               setDestination('')
               setDepPlace([])
-              setOpen(true)
+              setSaveStatus(true)
             }
             catch(err) {
               console.log(err)
@@ -386,11 +386,10 @@ console.log(busStatus)
           Save
         </Button>
             </FormWrapper>
-            <SaveSuccessfull open={open} handleClose={handleClose} message = 'Route Successfully Added' />
+            <SaveSuccessfull open={saveStatus} handleClose={handleSaveStatusClose} message = 'Route Successfully Added' />
             <SameCity open = {samecity} handleClose = {handleSameCityClose}/>
       </form>
       </Box>
-
     </div>
    
   );

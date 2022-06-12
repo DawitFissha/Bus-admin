@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {NoOfSeatArray} from '../../utils/noOfSeatArray'
+import {getSeatList} from '../../utils/getSeatList'
 import Tooltip from '@mui/material/Tooltip';
 import Grid from '@mui/material/Grid';
 import SeatBox from './seatBox'
@@ -13,7 +13,7 @@ const SeatBoxes = (props:SeatBoxesProps)=> {
       return (
           <>
           {
-              NoOfSeatArray(noOfSeat?noOfSeat:49).map((value:number)=>(
+              getSeatList(noOfSeat?noOfSeat:49).map((value:number)=>(
                   <Grid key = {value} item xs={2}>
                   <Tooltip title={`Seat - ${value}`}>
                   <SeatBox  variant='outlined'

@@ -15,6 +15,7 @@ interface SeatPickerProps {
 
 export default function SeatPicker(props:SeatPickerProps) {
   const {open,handleClose,handleSeatChoosing,numberOfSeat,occupiedSeats,busPlateNo} = props
+  // console.log('rendered again')
     return (
         <DialogRenderer title = "Pick A Seat" open={open} handleClose={handleClose}>
       

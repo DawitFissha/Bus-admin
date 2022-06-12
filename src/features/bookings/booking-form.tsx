@@ -4,15 +4,15 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import Divider from '@mui/material/Divider';
 import Select,{SelectChangeEvent} from '@mui/material/Select';
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
-import {AutomaticSeatPicker} from '../../utils/automaticSeatPicker'
-import {NoOfSeatArray} from '../../utils/noOfSeatArray'
 import { styled } from '@mui/system';
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { FormControl, InputAdornment, InputLabel, MenuItem } from '@mui/material';
 import Box from '@mui/material/Box';
+import {SavingProgress} from '../../Components/savingProgress'
 import { DatePicker } from '@mui/lab';
 import { useFormik } from 'formik';
+import {SaveSuccessfull} from '../../Components/saveSuccess'
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import PlaceIcon from '@mui/icons-material/Place';
 import EventIcon from '@mui/icons-material/Event';
@@ -22,6 +22,7 @@ import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import SeatPicker from '../../Components/seat-picker'
 import {fetchSchedules} from '../schedule/scheduleSlice'
 import {allBusses} from '../../App'
+import AuthService from '../../services/auth.service'
 type FormTypes = {firstName:string,lastName:string,phoneNumber:string,seatNumber?:number}
 const validate = (values:FormTypes) => {
     const errors:Partial<FormTypes> = {}
@@ -43,7 +44,6 @@ const TextFieldForBooking = styled(TextField)({
 })
 
 export function Booking(){
-const timer = React.useRef<number>();
 const [seatPickerOpen,setSeatPickerOpen] = React.useState(false)
 const handleClickOpenSeatPicker = ()=>{
   setSeatPickerOpen(true)
@@ -52,29 +52,41 @@ const handleCloseSeatPickcer = ()=>{
   setSeatPickerOpen(false)
 }
 const handleSeatChoosing = (seat:number)=>{
-  setSeatNumber(seat)
+  setSeatNumber(prev=>[...prev,seat])
   setSeatPickerOpen(false)
 }
 const dispatch = useAppDispatch();
 const [schedule,setSchedule] = React.useState('')
 const [bookingDate,setBookingDate] = React.useState<Date|null>(new Date())
 const scheduleInfo = useAppSelector(state=>state.schedules.schedules.find(sch=>sch._id===schedule))
-const [seatNumber,setSeatNumber] = React.useState(1)
+const [saveStatus,setSaveStatus] = React.useState(false)
+const handleSaveStatusClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  if (reason === 'clickaway') {
+    return;
+  }
+  setSaveStatus(false);
+};
+const [seatNumber, setSeatNumber] = React.useState<number[]>([]);
 const handleScheduleChange = (e:SelectChangeEvent)=>{
     setSchedule(e.target.value)
 }
+
 const [loading, setLoading] = React.useState(false);
 const schedules = useAppSelector(state=>state.schedules.schedules)
 const scheduleStatus = useAppSelector(state=>state.schedules.status)
-console.log(schedule ? Math.min(...AutomaticSeatPicker(NoOfSeatArray(scheduleInfo?.totalNoOfSit),scheduleInfo?.occupiedSitNo)) : 1)
+
 React.useEffect(()=>{
+
   document.title+=` - Book A Ticket`
   if(scheduleStatus==='idle'){
     dispatch(fetchSchedules())
   }
-  setSeatNumber(Math.min(...AutomaticSeatPicker(NoOfSeatArray(scheduleInfo?.totalNoOfSit),scheduleInfo?.occupiedSitNo)))
 
-},[scheduleInfo,scheduleStatus,dispatch])
+if(Boolean(schedule&&(seatNumber?.length>0))){
+  AuthService.lockSit(seatNumber,schedule)
+}
+
+},[scheduleInfo,scheduleStatus,dispatch,schedule,seatNumber])
 const formik = useFormik({
   initialValues: {
   firstName:'',
@@ -82,27 +94,17 @@ const formik = useFormik({
   phoneNumber:'',
   },
   validate,
-  onSubmit: (values,{resetForm}) => {
-    //  if(!canSave){
-    //   setRequired('required')
-    //   return
-
-    //  }
+  onSubmit: async (values,{resetForm}) => {
+  
       if(!loading){
           setLoading(true)
-          timer.current = window.setTimeout(()=>{
+          try {
+            await AuthService.bookTicket({
+              passname:`${values.firstName} ${values.lastName}`,
+              passphone:values.phoneNumber,
+              sits:seatNumber
+            },schedule)
             
-            // dispatch(addSchedule({
-            //   id:nanoid(),
-            //   description:values.description,
-            //   creationDate:format(new Date(),'MM/dd/yyyy'),
-            //   departureDate,
-            //   departureTime,
-            //   Route:routeId,
-            //   departurePlaces:depPlace?depPlace:undefined,
-            //   busId:'dummy0Bus',
-            // }))
-            setLoading(false)
             resetForm({values:{
               seatNumber:1,
               firstName:'',
@@ -111,9 +113,16 @@ const formik = useFormik({
             }})
             
             setSchedule('')
+            setSaveStatus(true)
             // setOpen(true)
             // setRequired('')
-          },3000)
+          }
+          catch(err){
+            console.log(`something happened ${err}`)
+          }
+          finally {
+            setLoading(false)
+          }
         }
      
   },
@@ -121,6 +130,7 @@ const formik = useFormik({
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <SavingProgress loading={loading}/>
           <form onSubmit={formik.handleSubmit}>
         <div
         style = {{
@@ -274,6 +284,7 @@ const formik = useFormik({
              </Box>
              <Box sx={{display:'flex',m:1,paddingTop:'10px'}}>
              <Box sx={{marginLeft:'6px'}}>
+
                     {/* departure place select goes here  */}
                     <FormControl sx={{maxWidth:'250px',minWidth:'200px',}}>
            
@@ -302,8 +313,8 @@ const formik = useFormik({
                     id="seat-number"
                     name="seatNumber"
                     label="Seat Number"
-                    type="number"
-                    value={seatNumber}
+                  
+                    value={seatNumber?.join(',')}
                     disabled
                     InputProps={{
                       startAdornment:(
@@ -314,7 +325,8 @@ const formik = useFormik({
                         </InputAdornment>
                       )
                     }}
-                        />
+                        /> 
+                        
                 </Box>
                 <Box sx={{alignSelf:'center',marginLeft:'32px'}}>
                   <Button disabled={!Boolean(schedule)} color = "primary" variant="text" 
@@ -409,6 +421,7 @@ const formik = useFormik({
               
         </div>
         </form>
+        <SaveSuccessfull open={saveStatus} handleClose={handleSaveStatusClose} message = 'Ticket Successfully Booked' />
         <SeatPicker busPlateNo = {scheduleInfo?.assignedBus?allBusses.find((activeBus:any)=>activeBus._id===scheduleInfo?.assignedBus).busPlateNo:'x'} occupiedSeats={scheduleInfo?.occupiedSitNo} numberOfSeat = {scheduleInfo?.totalNoOfSit} handleSeatChoosing = {handleSeatChoosing} open={seatPickerOpen} handleClose = {handleCloseSeatPickcer}/>
         </LocalizationProvider>
     )
