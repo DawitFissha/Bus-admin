@@ -41,12 +41,16 @@ addBus(newBus){
       destination, tarif, estimatedhour, distance,
     }, { headers: authHeader() });
   }
-  lockSit(sits) {
+  lockSit(sits,schedule) {
     console.log(sits)
-    return axios.put(API_URL + `locksit/6214d859b3778328889ce30a`, {
+    return axios.put(API_URL + `locksit/${schedule}`, {
       sits
     }, { headers: authHeader() });
   }
+
+ bookTicket(passengerInfo,schedule){
+  return axios.put(`${API_URL}bookticketfromschedule/${schedule}`,passengerInfo, { headers: authHeader() })
+ }
  
   updateBusInfo(busplateno, bussideno, driversuername, isactive, totalsit, id) {
 
