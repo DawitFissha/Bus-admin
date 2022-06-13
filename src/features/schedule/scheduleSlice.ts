@@ -2,15 +2,16 @@
 import {createSlice,createAsyncThunk} from '@reduxjs/toolkit'
 import UserService from '../../services/user.service'
 import AuthService from "../../services/auth.service";
+
 export const fetchSchedules = createAsyncThunk('schedules/fetchSchedules',async ()=>{
     return await (await UserService.getSchedules()).data
     })
-
+    
 export const addSchedule = createAsyncThunk('schedules/addNewSchedule',async (schedule: any) => {
     return await  ( await AuthService.addSchedule(schedule)).data
     }
-
 )
+
 export interface SCHEDULE {
     id:string
     description:string
@@ -36,6 +37,9 @@ const scheduleSlice = createSlice({
     name:'schedules',
     initialState,
     reducers:{
+        resetSchedule:(state)=> {
+            state.schedules = initialState.schedules
+        }
      },
      extraReducers(builder){
         builder
@@ -56,3 +60,4 @@ const scheduleSlice = createSlice({
      }
 })
 export default scheduleSlice.reducer
+export const {resetSchedule} = scheduleSlice.actions
