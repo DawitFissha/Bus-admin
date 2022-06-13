@@ -7,7 +7,6 @@ import cityReducer from '../features/city/citySlice'
 import busReducer from '../features/bus/busSlice'
 import scheduleReducer from '../features/schedule/scheduleSlice'
 import busStateReducer from '../features/bus-states/busstateSlice'
-import ticketReducer from '../features/bookings/ticketslice'
 
 export const store = configureStore({
   reducer: {
@@ -19,7 +18,7 @@ export const store = configureStore({
     busses:busReducer,
     schedules:scheduleReducer,
     busStates:busStateReducer, 
-    tickets:ticketReducer,
+    
   },
 });
 
