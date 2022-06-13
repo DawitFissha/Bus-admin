@@ -20,7 +20,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import SvgIcon from '@mui/material/SvgIcon';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import SeatPicker from '../../Components/seat-picker'
-import {fetchSchedules} from '../schedule/scheduleSlice'
+import {fetchSchedules,resetSchedule} from '../schedule/scheduleSlice'
 import {allBusses} from '../../App'
 import AuthService from '../../services/auth.service'
 type FormTypes = {firstName:string,lastName:string,phoneNumber:string,seatNumber?:number}
@@ -74,10 +74,11 @@ const handleScheduleChange = (e:SelectChangeEvent)=>{
 const [loading, setLoading] = React.useState(false);
 const schedules = useAppSelector(state=>state.schedules.schedules)
 const scheduleStatus = useAppSelector(state=>state.schedules.status)
+const [seatNumberRequired,setSeatNumberRequired] = React.useState(false)
 
 React.useEffect(()=>{
 
-  document.title+=` - Book A Ticket`
+document.title+=` - Book A Ticket`
   if(scheduleStatus==='idle'){
     dispatch(fetchSchedules())
   }
@@ -85,8 +86,11 @@ React.useEffect(()=>{
 if(Boolean(schedule&&(seatNumber?.length>0))){
   AuthService.lockSit(seatNumber,schedule)
 }
+if(seatNumber.length>0){
+  setSeatNumberRequired(false)
+}
 
-},[scheduleInfo,scheduleStatus,dispatch,schedule,seatNumber])
+},[scheduleStatus,dispatch,schedule,seatNumber])
 const formik = useFormik({
   initialValues: {
   firstName:'',
@@ -95,7 +99,10 @@ const formik = useFormik({
   },
   validate,
   onSubmit: async (values,{resetForm}) => {
-  
+    if(seatNumber.length===0){
+      setSeatNumberRequired(true)
+      return 
+    }
       if(!loading){
           setLoading(true)
           try {
@@ -112,11 +119,13 @@ const formik = useFormik({
               phoneNumber:'',
             }})
             
-            setSchedule('')
+            setSeatNumberRequired(false)
+            setSeatNumber([])
             setSaveStatus(true)
-            // setOpen(true)
-            // setRequired('')
-          }
+            dispatch(resetSchedule())
+            dispatch(fetchSchedules())
+            setSchedule(prev=>prev)
+}
           catch(err){
             console.log(`something happened ${err}`)
           }
@@ -145,9 +154,7 @@ const formik = useFormik({
         >
            <Box sx ={{
              paddingTop:"5px"
-            //  display:'table-cell',
-            //  verticalAlign:"middle"
-           }}>
+            }}>
            <h2 style= {{
                 textAlign:"center",
             }}>Book A Ticket</h2>
@@ -161,7 +168,7 @@ const formik = useFormik({
            <InputLabel id="schedule-select-helper-label">Schedule</InputLabel>
            
            <Select
-            
+              // ref = {scheduleRef}
              labelId="schedule-select-helper-label"
              id="role-select-helper"
              value={schedule}
@@ -325,6 +332,9 @@ const formik = useFormik({
                         </InputAdornment>
                       )
                     }}
+                    error={seatNumberRequired}
+                    helperText={seatNumberRequired && 'Please Select a seat first'}
+
                         /> 
                         
                 </Box>
@@ -404,7 +414,7 @@ const formik = useFormik({
                     }}
                     error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
                     helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
-                                    />
+                    />
                 </Box>
                  </Box>
                  <Divider/>
