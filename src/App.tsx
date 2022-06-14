@@ -16,7 +16,7 @@ import {RequireAuth} from './Components/requireAuth'
 import {fetchBusses} from './features/bus/busSlice'
 import {useAppSelector} from './app/hooks'
 import {useAppDispatch} from './app/hooks'
-
+import TicketHeader from './Components/ticket/ticket-header'
 export let allBusses:any
 export let ActiveBusses:any[]
 function App() {
@@ -42,6 +42,7 @@ function App() {
         <Route path='/' element = {<PublicPage/>}/>
         <Route path='/login' element = {<Login/>}/>
         <Route path='/orgCode' element = {<OrganizationCode/>}/>
+        <Route path='/ticket' element = {<TicketHeader/>}/>
         <Route
             path="/booking"
             element={
