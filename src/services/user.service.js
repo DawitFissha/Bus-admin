@@ -25,6 +25,9 @@ class UserService {
   getRedats() {
     return axios.get(API_URL + `getuserbyrole?role=redat`, { headers: authHeader() });
   }
+  getCashiers() {
+    return axios.get(API_URL + `getuserbyrole?role=casher`, { headers: authHeader() });
+  }
   getRoutes() {
     return axios.get(API_URL + `getorganizationroute`, { headers: authHeader() });
   }

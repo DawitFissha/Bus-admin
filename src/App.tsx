@@ -8,7 +8,7 @@ import {RouteRegistration} from './features/route/routeform'
 import {BusRegistration} from './features/bus/busform'
 import {Schedule} from './features/schedule/scheduleform'
 import {BusList} from './features/bus/buslist'
-import {Booking} from './features/bookings/booking-form'
+import {Booking} from './features/bookings'
 import {Login} from './Components/login'
 import {OrganizationCode} from './Components/orgUnit'
 import {PublicPage} from './Components/publicPage'
@@ -16,7 +16,8 @@ import {RequireAuth} from './Components/requireAuth'
 import {fetchBusses} from './features/bus/busSlice'
 import {useAppSelector} from './app/hooks'
 import {useAppDispatch} from './app/hooks'
-import TicketHeader from './Components/ticket/ticket-header'
+import BookingHistory from './Components/mySale/sales'
+import MainCashierPage from './Components/cashierPage'
 export let allBusses:any
 export let ActiveBusses:any[]
 function App() {
@@ -42,7 +43,9 @@ function App() {
         <Route path='/' element = {<PublicPage/>}/>
         <Route path='/login' element = {<Login/>}/>
         <Route path='/orgCode' element = {<OrganizationCode/>}/>
-        <Route path='/ticket' element = {<TicketHeader/>}/>
+        <Route path='/mysale' element = {<BookingHistory/>}/>
+        <Route path='/cashierPage' element = {<MainCashierPage/>}/>
+        
         <Route
             path="/booking"
             element={

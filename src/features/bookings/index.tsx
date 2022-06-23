@@ -39,8 +39,8 @@ const validate = (values:FormTypes) => {
     return errors;
   };
 const TextFieldForBooking = styled(TextField)({
-    maxWidth:'200px',
-    minWidth:'150px'
+    maxWidth:'190px',
+    minWidth:'140px'
 })
 
 export function Booking(){
@@ -143,13 +143,11 @@ const formik = useFormik({
           <form onSubmit={formik.handleSubmit}>
         <div
         style = {{
-             width:"850px",
-            marginTop:'2px',
-            marginLeft:'auto',
-            marginRight:'auto',
-            height:'auto',
+            maxWidth:"850px",
+            // marginTop:'2px',
+            height:'570px',
             background:'#FFFF',
-            marginBottom:'5px',
+            // marginBottom:'5px',
         }}
         >
            <Box sx ={{
@@ -168,7 +166,7 @@ const formik = useFormik({
            <InputLabel id="schedule-select-helper-label">Schedule</InputLabel>
            
            <Select
-              // ref = {scheduleRef}
+          
              labelId="schedule-select-helper-label"
              id="role-select-helper"
              value={schedule}

@@ -1,5 +1,6 @@
-
+import { tableCellClasses } from '@mui/material/TableCell';
 import {createTheme} from '@mui/material/styles'
+
 export const theme = createTheme({
     components:{
         MuiTextField:{
@@ -23,7 +24,6 @@ export const theme = createTheme({
                    backgroundColor:'#2E86C1',
                    color:'white',
                    borderColor: '#0063cc',
-                //    border:'1px solid',
                    '&:hover':{
                     background:'#2E86C1',
                    },
@@ -32,8 +32,7 @@ export const theme = createTheme({
            defaultProps:{
             variant:'contained',
             size:'medium',
-            
-           }
+        }
         },
         MuiDialogContent:{
             styleOverrides:{
@@ -52,6 +51,33 @@ export const theme = createTheme({
         MuiFormControl:{
             defaultProps:{
                 variant:'outlined'
+            }
+        },
+        MuiTableCell:{
+            styleOverrides:{
+                root:{
+                    [`&.${tableCellClasses.head}`]: {
+                        backgroundColor:'black',
+                        color:'white',
+                      },
+                      [`&.${tableCellClasses.body}`]: {
+                        fontWeight:'bolder',
+                        fontFamily: "sans-serif",
+                        fontSize:16,
+                      },
+                }
+            }
+        },
+        MuiIconButton:{
+            defaultProps:{
+                color:'primary'
+            }
+        },
+        MuiTab:{
+            styleOverrides:{
+                root:{
+                    textTransform:'none'
+                }
             }
         }
     }
