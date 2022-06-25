@@ -43,17 +43,17 @@ function App() {
         <Route path='/' element = {<PublicPage/>}/>
         <Route path='/login' element = {<Login/>}/>
         <Route path='/orgCode' element = {<OrganizationCode/>}/>
-        <Route path='/mysale' element = {<BookingHistory/>}/>
+        {/* <Route path='/mysale' element = {<BookingHistory/>}/> */}
         <Route path='/cashierPage' element = {<MainCashierPage/>}/>
         
-        <Route
+        {/* <Route
             path="/booking"
             element={
               <RequireAuth>
                 <Booking/>
               </RequireAuth>
             }
-          />
+          /> */}
         <Route
             path="/buslist"
             element={

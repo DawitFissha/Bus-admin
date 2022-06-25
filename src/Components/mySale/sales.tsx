@@ -16,10 +16,9 @@ import TablePaginationActions from './tablePaginationActions'
 import LinearProgress from '@mui/material/LinearProgress';
 import BookingRow from './bookingRow'
 
-export default function BookingHistory() {
+export default function BookingHistory({providedSchedule}:{providedSchedule:string}) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number,
@@ -39,7 +38,7 @@ const scheduleStatus = useAppSelector(state=>state.schedules.status)
 const cashiers = useAppSelector(state=>state.cashiers.cashiers)
 const cashierStatus = useAppSelector(state=>state.cashiers.status)
 const dispatch = useAppDispatch()
-const selectedSchedule = schedules.find(sch=>sch._id === '6214ceeaa0c60a532437d293')
+const selectedSchedule = schedules.find(sch=>sch._id === providedSchedule)
 const passengerInfo:any = selectedSchedule?.passangerInfo.map((passInfo:any)=>(
     {
         name:passInfo?.passangerName[0],

@@ -24,6 +24,9 @@ import {fetchSchedules,resetSchedule} from '../schedule/scheduleSlice'
 import {allBusses} from '../../App'
 import AuthService from '../../services/auth.service'
 type FormTypes = {firstName:string,lastName:string,phoneNumber:string,seatNumber?:number}
+interface bookingProps {
+  passSchedule:(schedule:string)=>void
+}
 const validate = (values:FormTypes) => {
     const errors:Partial<FormTypes> = {}
     
@@ -43,7 +46,8 @@ const TextFieldForBooking = styled(TextField)({
     minWidth:'140px'
 })
 
-export function Booking(){
+function BadBooking(props:bookingProps){
+  const {passSchedule} = props
 const [seatPickerOpen,setSeatPickerOpen] = React.useState(false)
 const handleClickOpenSeatPicker = ()=>{
   setSeatPickerOpen(true)
@@ -69,7 +73,7 @@ const handleSaveStatusClose = (event?: React.SyntheticEvent | Event, reason?: st
 const [seatNumber, setSeatNumber] = React.useState<number[]>([]);
 const handleScheduleChange = (e:SelectChangeEvent)=>{
     setSchedule(e.target.value)
-}
+    }
 
 const [loading, setLoading] = React.useState(false);
 const schedules = useAppSelector(state=>state.schedules.schedules)
@@ -78,7 +82,7 @@ const [seatNumberRequired,setSeatNumberRequired] = React.useState(false)
 
 React.useEffect(()=>{
 
-document.title+=` - Book A Ticket`
+document.title = `X Bus - Book A Ticket`
   if(scheduleStatus==='idle'){
     dispatch(fetchSchedules())
   }
@@ -89,8 +93,8 @@ if(Boolean(schedule&&(seatNumber?.length>0))){
 if(seatNumber.length>0){
   setSeatNumberRequired(false)
 }
-
-},[scheduleStatus,dispatch,schedule,seatNumber])
+passSchedule(schedule)
+},[scheduleStatus,dispatch,schedule,seatNumber,passSchedule])
 const formik = useFormik({
   initialValues: {
   firstName:'',
@@ -434,3 +438,4 @@ const formik = useFormik({
         </LocalizationProvider>
     )
 }
+export const Booking = React.memo(BadBooking)
