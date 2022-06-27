@@ -15,7 +15,8 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import DatePicker from '@mui/lab/DatePicker';
 import {useAppDispatch,useAppSelector} from '../../app/hooks'
 interface filterPanelProps {
-activeSchedule:string
+activeSchedule:string,
+passSchedule:(sch:string)=>void
 }
 function SearchFields() {
 
@@ -52,7 +53,7 @@ function SearchFields() {
 
 export default function FilterPanel(props:filterPanelProps) {
 
-    const {activeSchedule} = props
+    const {activeSchedule,passSchedule} = props
     const schedules = useAppSelector(state=>state.schedules.schedules)
     const [schedule,setSchedule] = React.useState(activeSchedule)
     const scheduleInfo = useAppSelector(state=>state.schedules.schedules.find(sch=>sch._id===schedule))
@@ -60,6 +61,9 @@ export default function FilterPanel(props:filterPanelProps) {
         setSchedule(e.target.value)
         }
     const [dateValue, setDateValue] = React.useState<Date | null>(null);
+    React.useEffect(()=>{
+      passSchedule(schedule)
+    },[schedule])
     return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Box sx={{ml:2}}>

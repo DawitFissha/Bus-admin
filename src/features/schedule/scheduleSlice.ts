@@ -1,8 +1,6 @@
-
 import {createSlice,createAsyncThunk} from '@reduxjs/toolkit'
 import UserService from '../../services/user.service'
 import AuthService from "../../services/auth.service";
-
 export const fetchSchedules = createAsyncThunk('schedules/fetchSchedules',async ()=>{
     return await (await UserService.getSchedules()).data
     })
@@ -24,11 +22,13 @@ export interface SCHEDULE {
 }
 type initialStateType = {
     schedules:any[],
+    globalSchedules:any[]
     status:'idle' | 'loading' | 'succeeded' | 'failed'
     error:string|undefined
 }
 const initialState:initialStateType = {
     schedules:[],
+    globalSchedules:[],
     status:'idle',
     error:""
     } as initialStateType
@@ -39,6 +39,9 @@ const scheduleSlice = createSlice({
     reducers:{
         resetSchedule:(state)=> {
             state.schedules = initialState.schedules
+        },
+        addtoGlobalSchedules:(state,action)=>{
+            state.globalSchedules.push(action.payload)
         }
      },
      extraReducers(builder){
@@ -60,4 +63,4 @@ const scheduleSlice = createSlice({
      }
 })
 export default scheduleSlice.reducer
-export const {resetSchedule} = scheduleSlice.actions
+export const {resetSchedule,addtoGlobalSchedules} = scheduleSlice.actions

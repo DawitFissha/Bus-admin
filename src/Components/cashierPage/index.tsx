@@ -66,7 +66,7 @@ export default function MainCashierPage() {
                 <Box sx={{flexGrow:1}}>
                 <BookingHistory providedSchedule={scheduleValue}/>
                 </Box>
-        <FilterPanel activeSchedule={scheduleValue}/>
+        <FilterPanel passSchedule ={getSchedule} activeSchedule={scheduleValue}/>
         </Box>
         
       </TabPanel>

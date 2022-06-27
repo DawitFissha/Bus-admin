@@ -20,7 +20,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import SvgIcon from '@mui/material/SvgIcon';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import SeatPicker from '../../Components/seat-picker'
-import {fetchSchedules,resetSchedule} from '../schedule/scheduleSlice'
+import {fetchSchedules,resetSchedule,addtoGlobalSchedules} from '../schedule/scheduleSlice'
 import {allBusses} from '../../App'
 import AuthService from '../../services/auth.service'
 type FormTypes = {firstName:string,lastName:string,phoneNumber:string,seatNumber?:number}
@@ -60,7 +60,9 @@ const handleSeatChoosing = (seat:number)=>{
   setSeatPickerOpen(false)
 }
 const dispatch = useAppDispatch();
-const [schedule,setSchedule] = React.useState('')
+const globalSchedules = useAppSelector(state=>state.schedules.globalSchedules)
+const activeSchedule = useAppSelector(state=>state.schedules.globalSchedules[globalSchedules.length-1])
+const [schedule,setSchedule] = React.useState(globalSchedules.length>0?activeSchedule:'')
 const [bookingDate,setBookingDate] = React.useState<Date|null>(new Date())
 const scheduleInfo = useAppSelector(state=>state.schedules.schedules.find(sch=>sch._id===schedule))
 const [saveStatus,setSaveStatus] = React.useState(false)
@@ -94,6 +96,7 @@ if(seatNumber.length>0){
   setSeatNumberRequired(false)
 }
 passSchedule(schedule)
+dispatch(addtoGlobalSchedules(schedule))
 },[scheduleStatus,dispatch,schedule,seatNumber,passSchedule])
 const formik = useFormik({
   initialValues: {
@@ -128,7 +131,7 @@ const formik = useFormik({
             setSaveStatus(true)
             dispatch(resetSchedule())
             dispatch(fetchSchedules())
-            setSchedule(prev=>prev)
+            setSchedule((prev:string)=>prev)
 }
           catch(err){
             console.log(`something happened ${err}`)
