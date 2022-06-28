@@ -1,4 +1,4 @@
-import { tableCellClasses } from '@mui/material/TableCell';
+
 import {createTheme} from '@mui/material/styles'
 
 export const theme = createTheme({
@@ -51,21 +51,6 @@ export const theme = createTheme({
         MuiFormControl:{
             defaultProps:{
                 variant:'outlined'
-            }
-        },
-        MuiTableCell:{
-            styleOverrides:{
-                root:{
-                    [`&.${tableCellClasses.head}`]: {
-                        backgroundColor:'black',
-                        color:'white',
-                      },
-                      [`&.${tableCellClasses.body}`]: {
-                        fontWeight:'bolder',
-                        fontFamily: "sans-serif",
-                        fontSize:16,
-                      },
-                }
             }
         },
         MuiIconButton:{

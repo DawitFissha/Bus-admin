@@ -6,16 +6,14 @@ import Box from '@mui/material/Box';
 import {Booking} from '../../features/bookings'
 import BookingHistory from '../mySale/sales'
 import FilterPanel from '../mySale/bookingFilterPanel'
-
+import {TodaysSalesSummary} from '../mySale/todaySales'
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
 }
-
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
-
   return (
     <div
       role="tabpanel"
@@ -66,7 +64,15 @@ export default function MainCashierPage() {
                 <Box sx={{flexGrow:1}}>
                 <BookingHistory providedSchedule={scheduleValue}/>
                 </Box>
-        <FilterPanel passSchedule ={getSchedule} activeSchedule={scheduleValue}/>
+                <Box sx={{display:'flex',flexDirection:'column',gap:"20px",ml:2}}>
+                  <Box>
+                  <FilterPanel passSchedule ={getSchedule} activeSchedule={scheduleValue}/>
+                  </Box>
+                  <Box>
+                    <TodaysSalesSummary/>
+                  </Box>
+                </Box>
+        
         </Box>
         
       </TabPanel>

@@ -10,7 +10,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import TripInfo from './tripInfo'
 import Actions from './actions'
-
+import { tableCellClasses } from '@mui/material/TableCell';
+import { styled } from '@mui/material/styles';
 interface tripInfoProps {
     bookingDate:string,
     bookedBy:string,
@@ -24,6 +25,14 @@ interface bookingRowProps {
     seatNumber: string,
     tripHistory:tripInfoProps
 }
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.body}`]: {
+    fontWeight:'bolder',
+    fontFamily: "sans-serif",
+    fontSize:16,
+  },
+}));
+
 export default function BookingRow(props: { row: bookingRowProps}) {
     const { row } = props;
     const [open, setOpen] = React.useState(false);
@@ -31,7 +40,7 @@ export default function BookingRow(props: { row: bookingRowProps}) {
     return (
       <React.Fragment>
         <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-          <TableCell>
+          <StyledTableCell>
             <Tooltip title="More details">
             <IconButton
               aria-label="expand row"
@@ -41,18 +50,18 @@ export default function BookingRow(props: { row: bookingRowProps}) {
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
             </Tooltip>
-          </TableCell>
-          <TableCell component="th" scope="row">
+          </StyledTableCell>
+          <StyledTableCell component="th" scope="row">
             {row.name}
-          </TableCell>
-          <TableCell sx={{fontWeight:'bolder'}} component="th" scope="row">{row.phoneNumber}</TableCell>
-          <TableCell component="th" scope="row">{row.seatNumber}</TableCell>
-          <TableCell align ="center" component="th" scope="row">
+          </StyledTableCell>
+          <StyledTableCell sx={{fontWeight:'bolder'}} component="th" scope="row">{row.phoneNumber}</StyledTableCell>
+          <StyledTableCell component="th" scope="row">{row.seatNumber}</StyledTableCell>
+          <StyledTableCell align ="center" component="th" scope="row">
             <Actions/>
-          </TableCell>
+          </StyledTableCell>
         </TableRow>
         <TableRow>
-          <TableCell style={{padding: 0 }} colSpan={6}>
+          <StyledTableCell style={{padding: 0 }} colSpan={6}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box sx={{backgroundColor: 'white', marginLeft: 0}}>
                 <Typography sx={{marginLeft:1}} variant="h6" gutterBottom component="div">
@@ -64,7 +73,7 @@ export default function BookingRow(props: { row: bookingRowProps}) {
                 
               </Box>
             </Collapse>
-          </TableCell>
+          </StyledTableCell>
         </TableRow>
       </React.Fragment>
     );

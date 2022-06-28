@@ -66,7 +66,7 @@ export default function FilterPanel(props:filterPanelProps) {
     },[schedule])
     return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <Box sx={{ml:2}}>
+        
         <div
         style={{
             width:'600px',
@@ -119,7 +119,7 @@ renderInput={(params) => <TextField  sx={{ maxWidth: '250px',minWidth:'180px',m:
 />
 
         </div>
-        </Box>
+        
         </LocalizationProvider>
     )
 }

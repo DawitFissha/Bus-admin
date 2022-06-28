@@ -12,9 +12,22 @@ import {useAppDispatch,useAppSelector} from '../../app/hooks'
 import {fetchSchedules} from '../../features/schedule/scheduleSlice'
 import {fetchCashiers} from '../../features/user/cashierSlice'
 import TablePaginationActions from './tablePaginationActions'
-import LinearProgress from '@mui/material/LinearProgress';
 import BookingRow from './bookingRow'
+import { styled } from '@mui/material/styles';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { tableCellClasses } from '@mui/material/TableCell';
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontWeight:'bolder',
+    fontFamily: "sans-serif",
+    fontSize:16,
+  },
+}));
 export default function BookingHistory({providedSchedule}:{providedSchedule:string}) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -73,16 +86,21 @@ React.useEffect(()=>{
     >
       
     <TableContainer sx={{maxHeight:'570px'}}>
+      
+        
       <Table stickyHeader aria-label="booking history table">
         <TableHead>
           <TableRow>
-            <TableCell />
-            <TableCell>Passenger Name</TableCell>
-            <TableCell>Phone Number</TableCell>
-            <TableCell >Seat Number</TableCell>
-            <TableCell align="center">Actions</TableCell>
+            <StyledTableCell />
+            <StyledTableCell>Passenger Name</StyledTableCell>
+            <StyledTableCell>Phone Number</StyledTableCell>
+            <StyledTableCell >Seat Number</StyledTableCell>
+            <StyledTableCell align="center">Actions</StyledTableCell>
           </TableRow>
         </TableHead>
+        {
+          passengerInfo?
+          <>
         <TableBody>
           {
            (rowsPerPage > 0
@@ -94,12 +112,12 @@ React.useEffect(()=>{
           }
         {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
+              <StyledTableCell colSpan={6} />
             </TableRow>
           )}
         </TableBody>
-          {
-            passengerInfo?
+          
+            
             <TableFooter>
             <TableRow>
               <TablePagination
@@ -119,14 +137,34 @@ React.useEffect(()=>{
                 ActionsComponent={TablePaginationActions}
               />
             </TableRow>
-          </TableFooter>:
-           <Box sx={{ width: '100%' }}>
-           <LinearProgress /> loading booking history ...
+          </TableFooter>
+          </>
+          :
+          <div style = {{
+            width:"100%",
+            margin:'11px'
+       }}>
+        {/* <img src={emptyCalendar} style={{
+         width:'250px',
+         height:"250px"
+        }}/> */}
+        <Box sx={{display:"flex",gap:'5px',alignItems:'center'}}>
+         <Box>
+         <CalendarTodayIcon color="primary" fontSize='large'/>
          </Box>
-          }
+         <Box>
+         Schedule is Empty Please select a Schedule
+         </Box>
+        </Box>
+        
+        </div>
+        
+      }
       </Table>
+      
+
     </TableContainer>
-    
+   
     </div>
   );
 }
