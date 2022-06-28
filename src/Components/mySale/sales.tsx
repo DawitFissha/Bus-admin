@@ -53,6 +53,7 @@ const dispatch = useAppDispatch()
 const selectedSchedule = schedules.find(sch=>sch._id === providedSchedule)
 const passengerInfo:any = selectedSchedule?.passangerInfo.map((passInfo:any)=>(
     {
+        id:passInfo?._id,      
         name:passInfo?.passangerName[0],
         phoneNumber:passInfo?.passangerPhone,
         seatNumber:passInfo?.passangerOccupiedSitNo.join(','),
@@ -106,8 +107,8 @@ React.useEffect(()=>{
            (rowsPerPage > 0
             ? passengerInfo?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : passengerInfo
-          )?.map((row:any,index:number) => (
-            <BookingRow  key={index} row={row} />
+          )?.map((row:any) => (
+            <BookingRow  key={row.id} row={row} />
           ))
           }
         {emptyRows > 0 && (

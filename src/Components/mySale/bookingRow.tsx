@@ -12,6 +12,7 @@ import TripInfo from './tripInfo'
 import Actions from './actions'
 import { tableCellClasses } from '@mui/material/TableCell';
 import { styled } from '@mui/material/styles';
+import DialogRenderer from '../dialog/dialogRenderer'
 interface tripInfoProps {
     bookingDate:string,
     bookedBy:string,
@@ -20,6 +21,7 @@ interface tripInfoProps {
   }
   
 interface bookingRowProps {
+    id:string,
     name: string,
     phoneNumber: string,
     seatNumber: string,
@@ -36,7 +38,14 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 export default function BookingRow(props: { row: bookingRowProps}) {
     const { row } = props;
     const [open, setOpen] = React.useState(false);
-  
+    const [passengerId,setPassengerId] = React.useState('')
+    const [editOpen,setEditOpen] = React.useState(false)
+    const handleEditOpen = (id:string)=>{
+        setEditOpen(true)
+        setPassengerId(id)
+        console.log(passengerId)
+    }
+
     return (
       <React.Fragment>
         <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -57,7 +66,7 @@ export default function BookingRow(props: { row: bookingRowProps}) {
           <StyledTableCell sx={{fontWeight:'bolder'}} component="th" scope="row">{row.phoneNumber}</StyledTableCell>
           <StyledTableCell component="th" scope="row">{row.seatNumber}</StyledTableCell>
           <StyledTableCell align ="center" component="th" scope="row">
-            <Actions/>
+            <Actions passid={row.id} onClickEdit = {handleEditOpen}/>
           </StyledTableCell>
         </TableRow>
         <TableRow>
@@ -69,8 +78,6 @@ export default function BookingRow(props: { row: bookingRowProps}) {
                 </Typography>
               
                     <TripInfo tripInfo = {row.tripHistory}/>
-                  
-                
               </Box>
             </Collapse>
           </StyledTableCell>
