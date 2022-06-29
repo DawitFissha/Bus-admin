@@ -17,7 +17,7 @@ const {open,handleClose,title,children} = props
                 <BootstrapDialogTitle id="draggable-dialog-title" onClose={handleClose}>
                 {title}
         </BootstrapDialogTitle>
-              <DialogContent sx = {{backgroundColor:'#706C6C'}} dividers>
+              <DialogContent /*sx = {{backgroundColor:'#706C6C'}} */ dividers>
                   {children}
               </DialogContent>
             </Dialog>

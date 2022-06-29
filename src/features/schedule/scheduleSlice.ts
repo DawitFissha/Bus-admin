@@ -42,6 +42,16 @@ const scheduleSlice = createSlice({
         },
         addtoGlobalSchedules:(state,action)=>{
             state.globalSchedules.push(action.payload)
+        },
+        updatePassenger:(state,action) => {
+            const {scheduleId,passengerId,newPassengerDetails} = action.payload
+            const selectedSchedule = state.schedules.find(sch=>sch._id === scheduleId)
+            const existingPassengerDetail = selectedSchedule.passangerInfo.find((passInfo:any)=>passInfo._id === passengerId)
+
+            if(existingPassengerDetail){
+                existingPassengerDetail.passangerName = `${newPassengerDetails.firstName} ${newPassengerDetails.lastName}`
+                existingPassengerDetail.passangerPhone = newPassengerDetails.phoneNumber
+            }
         }
      },
      extraReducers(builder){
@@ -63,4 +73,4 @@ const scheduleSlice = createSlice({
      }
 })
 export default scheduleSlice.reducer
-export const {resetSchedule,addtoGlobalSchedules} = scheduleSlice.actions
+export const {resetSchedule,addtoGlobalSchedules,updatePassenger} = scheduleSlice.actions

@@ -18,7 +18,7 @@ import {useAppSelector} from './app/hooks'
 import {useAppDispatch} from './app/hooks'
 import BookingHistory from './Components/mySale/sales'
 import MainCashierPage from './Components/cashierPage'
-import EditPassengerInfo from './Components/editPassengerInfo'
+
 export let allBusses:any
 export let ActiveBusses:any[]
 function App() {
@@ -44,7 +44,6 @@ function App() {
         <Route path='/' element = {<PublicPage/>}/>
         <Route path='/login' element = {<Login/>}/>
         <Route path='/orgCode' element = {<OrganizationCode/>}/>
-        <Route path='/editpass' element = {<EditPassengerInfo/>}/>
         <Route path='/cashierPage' element = {<MainCashierPage/>}/>
         
         {/* <Route

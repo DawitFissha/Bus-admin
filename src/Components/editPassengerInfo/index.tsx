@@ -7,17 +7,21 @@ import Tooltip from  '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography';
 import { useFormik } from 'formik';
 import Button from '@mui/material/Button'
-
+import {updatePassenger} from '../../features/schedule/scheduleSlice'
+import {useAppDispatch} from '../../app/hooks'
 interface passengerTypes {
     firstName:string;
     lastName:string,
     phoneNumber:string
 }
 interface editPassengerProps {
+    selectedSchedule:string
+    passengerId:string
     previousFirstName:string,
     previousLastName:string,
     previousPhoneNumber:string,
     previousSeatNumber:number[],
+    closeDialogOnSave:()=>void
 }
 const validate = (values:passengerTypes) => {
     const errors:Partial<passengerTypes> = {}
@@ -35,12 +39,13 @@ const validate = (values:passengerTypes) => {
   };
 
 export default function EditPassengerInfo(props:editPassengerProps) {
-    const {previousFirstName,previousLastName,previousPhoneNumber,previousSeatNumber} = props
+    const {selectedSchedule,passengerId,previousFirstName,previousLastName,previousPhoneNumber,previousSeatNumber,closeDialogOnSave} = props
+    const dispatch = useAppDispatch()
     const formik = useFormik({
         initialValues:{
             firstName:previousFirstName,
             lastName:previousLastName,
-            phoneNumber:previousLastName,
+            phoneNumber:previousPhoneNumber,
         },
         validate,
         onSubmit:(values,{resetForm})=>{
@@ -50,6 +55,18 @@ export default function EditPassengerInfo(props:editPassengerProps) {
                 lastName:'',
                 phoneNumber:'',
             }})
+            dispatch(updatePassenger(
+           {
+            scheduleId:selectedSchedule,
+            passengerId,
+            newPassengerDetails:{
+              firstName:values.firstName,
+              lastName:values.lastName,
+              phoneNumber:values.phoneNumber
+            }
+           }
+            ))
+            closeDialogOnSave()
         }
     })
     return (
@@ -85,7 +102,7 @@ export default function EditPassengerInfo(props:editPassengerProps) {
         <Box  sx={{marginTop:'15px',display:'flex',alignItems:'center'}}>
             <Box sx={{marginTop:'3px'}}>
             <Typography variant="h6" gutterBottom component="div">
-            Seat Number: 12 
+            Seat Number: {previousSeatNumber}
       </Typography>
             </Box>
             

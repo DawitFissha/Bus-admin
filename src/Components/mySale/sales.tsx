@@ -108,7 +108,7 @@ React.useEffect(()=>{
             ? passengerInfo?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : passengerInfo
           )?.map((row:any) => (
-            <BookingRow  key={row.id} row={row} />
+            <BookingRow currentSchedule={providedSchedule} key={row.id} row={row} />
           ))
           }
         {emptyRows > 0 && (

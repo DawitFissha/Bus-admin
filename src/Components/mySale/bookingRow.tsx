@@ -13,6 +13,9 @@ import Actions from './actions'
 import { tableCellClasses } from '@mui/material/TableCell';
 import { styled } from '@mui/material/styles';
 import DialogRenderer from '../dialog/dialogRenderer'
+import EditPassengerInfo from '../editPassengerInfo'
+import {useAppSelector} from '../../app/hooks'
+
 interface tripInfoProps {
     bookingDate:string,
     bookedBy:string,
@@ -26,6 +29,7 @@ interface bookingRowProps {
     phoneNumber: string,
     seatNumber: string,
     tripHistory:tripInfoProps
+    
 }
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.body}`]: {
@@ -35,17 +39,28 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-export default function BookingRow(props: { row: bookingRowProps}) {
-    const { row } = props;
+export default function BookingRow(props: { row: bookingRowProps,currentSchedule:string}) {
+    const { row,currentSchedule} = props;
     const [open, setOpen] = React.useState(false);
     const [passengerId,setPassengerId] = React.useState('')
+    const allPassengersPerSchedule = useAppSelector(state=>state.schedules.schedules)?.find((sch:any)=>sch._id === currentSchedule)?.passangerInfo
+    const passengerToEdit  = allPassengersPerSchedule?.find((passenger:any)=>passenger._id === passengerId)
+    const passengerName =  passengerToEdit?.passangerName[0]?.split(' ')
+    const firstNameToEdit =passengerName?passengerName[0]:''
+    const lastNameToEdit = passengerName?passengerName[1]?passengerName[1]:'':''
+    const phonNumberToEdit = passengerToEdit?.passangerPhone
+    const seatToEdit = passengerToEdit?.passangerOccupiedSitNo?passengerToEdit?.passangerOccupiedSitNo.join(','):''
     const [editOpen,setEditOpen] = React.useState(false)
     const handleEditOpen = (id:string)=>{
         setEditOpen(true)
         setPassengerId(id)
-        console.log(passengerId)
     }
-
+    const closeEditDialog = ()=>{
+      setEditOpen(false)
+    }
+    console.log(passengerId)
+    console.log(allPassengersPerSchedule)
+    console.log(currentSchedule)
     return (
       <React.Fragment>
         <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -67,6 +82,7 @@ export default function BookingRow(props: { row: bookingRowProps}) {
           <StyledTableCell component="th" scope="row">{row.seatNumber}</StyledTableCell>
           <StyledTableCell align ="center" component="th" scope="row">
             <Actions passid={row.id} onClickEdit = {handleEditOpen}/>
+
           </StyledTableCell>
         </TableRow>
         <TableRow>
@@ -82,6 +98,15 @@ export default function BookingRow(props: { row: bookingRowProps}) {
             </Collapse>
           </StyledTableCell>
         </TableRow>
+        {editOpen&&(
+          <DialogRenderer title='Edit Passenger Information' open = {editOpen} handleClose = {closeEditDialog}>
+              <EditPassengerInfo previousFirstName={firstNameToEdit} previousLastName = {lastNameToEdit} 
+                                  previousPhoneNumber = {phonNumberToEdit} previousSeatNumber = {seatToEdit}
+                                  closeDialogOnSave = {closeEditDialog}
+                                  selectedSchedule ={currentSchedule} passengerId = {passengerId}
+              />
+          </DialogRenderer>
+        )}
       </React.Fragment>
     );
   }
